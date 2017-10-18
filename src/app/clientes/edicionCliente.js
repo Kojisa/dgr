@@ -11,7 +11,7 @@ export default function main(){
 
     ReactDOM.render(
         <MUICont>
-            <Contenedor/>
+            <EdicionCliente/>
         </MUICont>,
         root
     )
@@ -19,7 +19,7 @@ export default function main(){
 
 
 
-class Contenedor extends Component{
+export class EdicionCliente extends Component{
 
     constructor(props){
 
@@ -409,7 +409,7 @@ class Contacto extends Component{
                 <TextField value={this.state.mail} onChange={this.actualizar} name='mail'
                 floatingLabelText={ <label htmlFor="">E-Mail</label> } />
                 <br/>
-                <RaisedButton label='Borrar' />
+                <RaisedButton label='Borrar' secondary={true} />
             </div>
         )
     }
