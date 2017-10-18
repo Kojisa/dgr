@@ -42,7 +42,7 @@ class Contenedor extends Component{
                 fechaAlta:'',
             },
             contactos:[{orden:'',
-                nombre:'Juan',
+                nombre:'',
                 apellido:'',
                 area:'',
                 cargo:'',
@@ -63,16 +63,22 @@ class Contenedor extends Component{
 
         return(
             <div>
-                <div style={{display:'inline-block', verticalAlign:'top', margin:'5px'}}>
-                    <Cliente numeroCliente={this.state.cliente.numeroCliente} razon={this.state.cliente.razon} nombreFantasia={this.state.cliente.nombreFantasia} 
-                    cuit={this.state.cliente.cuit} telefonos={this.state.cliente.telefonos} mail={this.state.cliente.mail} web={this.state.cliente.web} 
-                    calle={this.state.cliente.calle} altura={this.state.cliente.altura} piso={this.state.cliente.piso} localidad={this.state.localidad} 
-                    codigoPostal={this.state.cliente.codigoPostal} posIva={this.state.cliente.posIva} fechaAlta={this.state.cliente.fechaAlta} 
-                    tiposIVAS={this.state.tiposIVAS} localidades={this.state.localidades}/>
-                </div>
-                <div style={{display:'inline-block', verticalAlign:'top', margin:'5px'}}>
-                    <Contactos contactos={this.state.contactos} funAct={this.actualizar}/>
-                </div>
+                <Tabs style={{width:'410px',margin:'5px'}} >
+                    <Tab label='Cliente' >
+                        <div style={{display:'inline-block', verticalAlign:'top', margin:'5px'}}>
+                            <Cliente numeroCliente={this.state.cliente.numeroCliente} razon={this.state.cliente.razon} nombreFantasia={this.state.cliente.nombreFantasia} 
+                            cuit={this.state.cliente.cuit} telefonos={this.state.cliente.telefonos} mail={this.state.cliente.mail} web={this.state.cliente.web} 
+                            calle={this.state.cliente.calle} altura={this.state.cliente.altura} piso={this.state.cliente.piso} localidad={this.state.localidad} 
+                            codigoPostal={this.state.cliente.codigoPostal} posIva={this.state.cliente.posIva} fechaAlta={this.state.cliente.fechaAlta} 
+                            tiposIVAS={this.state.tiposIVAS} localidades={this.state.localidades}/>
+                        </div>
+                    </Tab>
+                    <Tab label='Contactos' >
+                        <div style={{display:'inline-block', verticalAlign:'top', margin:'5px'}}>
+                            <Contactos contactos={this.state.contactos} funAct={this.actualizar}/>
+                        </div>
+                    </Tab>
+                </Tabs>
             </div>  
         )
     }
