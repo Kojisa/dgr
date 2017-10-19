@@ -5,7 +5,7 @@ import injectTapPlugin from 'react-tap-event-plugin';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Paper,RaisedButton,AppBar,Drawer} from 'material-ui';
 import edicionCliente from './clientes/edicionCliente.js';
-
+import listaClientes from './clientes/listaClientes.jsx';
 
 
 
@@ -60,7 +60,9 @@ class Nav extends React.Component{
     crearLista(){
         let lista = [
             {nombre:'Edicion Cliente',
-            funcion:()=>edicionCliente()}
+            funcion:()=>edicionCliente()},
+            {nombre:'Clientes',
+            funcion:()=>listaClientes()},
         ];
         return lista;
 
