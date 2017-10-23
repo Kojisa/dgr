@@ -2,7 +2,8 @@ import {EdicionCliente} from './edicionCliente';
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
-import {TextField,Avatar,List,ListItem,Paper} from 'material-ui';
+import {TextField,Avatar,List,ListItem,Paper,
+        RaisedButton} from 'material-ui';
 import DBHandler from '../dbHandler';
 
 
@@ -26,35 +27,44 @@ class Contenedor extends Component{
 
         this.state = {
             clientes:[
-                {nombre:'Edesur',letra:'E',id:0},
-                {nombre:'Metrogas',letra:'M',id:1},
-                {nombre:'Aisa',letra:'A',id:2}
             ], //lista de diccionarios. diccionario:{
                 //'nombre', 
                 //'letra',
                 //'id'
                 //}
             actual:'', //cliente a mostrar
-            
+            mostrarEdicion:false,
+            filtro:'',
         };
 
         this.db = new DBHandler();
         this.cargarClientes = this.cargarClientes.bind(this);
         this.pedirClientes = this.pedirClientes.bind(this);
         this.actualizarDatos = this.actualizarDatos.bind(this);
+        //this.db.pedir_clientes(this.cargarClientes);
 
     }
 
     actualizarDatos(valor,campo){
-        this.setState({campo:valor})
+        let dic = {[campo]:valor};
+        if(campo === 'actual'){
+            dic['mostrarEdicion'] = true;
+        }
+        this.setState(dic)
     }
 
     pedirClientes(){
-
+        this.db.pedir_clientes(this.cargarClientes);
     }
 
     cargarClientes(datos){
 
+        this.setState({clientes:datos});
+
+    }
+
+    componentDidMount(){
+        this.pedirClientes();
     }
 
     generarListado(){
@@ -62,24 +72,37 @@ class Contenedor extends Component{
         let lista = this.state.clientes;
 
         return lista.map((elem,index)=>
-            (<Cliente nombre={elem.nombre} 
+            {
+            if( elem.nombre.toLowerCase().includes(this.state.filtro.toLowerCase()) || this.state.filtro === ''){return <Cliente nombre={elem.nombre} 
             letra={elem.letra} id={elem.id} 
-            funAct={this.actualizarDatos} />)
+            funAct={this.actualizarDatos} key={index}/>}
+            }
         )
     }
 
 
     render(){
-
+        let edicion = <EdicionCliente  numeroCliente = {this.state.actual}></EdicionCliente>
+        if( this.state.mostrarEdicion === false){
+            edicion = null;
+        }
         return(
             <div>
-                <Paper style={{width:'400px'}} >
+                <Paper style={{width:'400px',display:'inline-block'}} >
+                    <TextField floatingLabelText={ <label>Busqueda</label> } 
+                    onChange={(evento)=>this.actualizarDatos(evento.target.value,evento.target.name)
+                    } name='filtro' ></TextField>
+                    <RaisedButton label={'Nuevo'} primary={true} onClick={()=>(this.actualizarDatos('NUEVO','actual'))}/>
+                    <br/>
                     <div style={{margin:'5px'}} >
                         <List>
                             {this.generarListado()}
                         </List>
                     </div>
                 </Paper>
+                <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
+                    {edicion}
+                </div>
             </div>
         )
     }

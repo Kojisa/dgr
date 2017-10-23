@@ -9,15 +9,181 @@ export default class DBHandler{
         {nombre:'Aisa',letra:'A',id:3}
     ]
 
+    posicionesFrenteIva=['Responsable Inscripto','Monotributista','Exento',
+        'No alcanzado o No Responsable','Consumidor final'];
+
     datosClientes = {
-        0:{
+        1:{
             cliente:{
                 numeroCliente:1,
                 razon:'',
                 nombreFantasia:'Edesur',
                 cuit:'30-65511651-2',
-
+                email:'edesur@algo',
+                web:'www.edesur.com',
+                calle:'algun lugar',
+                altura:'123',
+                piso:'1',
+                localidad:'Capital Federal',
+                codigoPostal:'1321',
+                posIva:2,
+                fechaAlta:'',
+                telefonos:[],
+            },
+            contactos:[{
+                orden:'0',
+                nombre:'Juan',
+                apellido:'Perez',
+                area:'enegia',
+                cargo:'Gerente',
+                telefono:'4121312',
+                mail:'pejuan@edesur',
+                rubro:''
+            },
+            {
+                orden:'1',
+                nombre:'Alan',
+                apellido:'Diaz',
+                area:'enegia',
+                cargo:'Gerente',
+                telefono:'4121312',
+                mail:'aldiz@edesur',
+                rubro:''
+            },
+            {
+                orden:'',
+                nombre:'',
+                apellido:'',
+                area:'',
+                cargo:'',
+                telefono:'',
+                mail:'',
+                rubro:''
             }
+
+            ]
+
+        },
+        2:{
+            cliente:{
+                numeroCliente:2,
+                razon:'',
+                nombreFantasia:'Metrogas',
+                cuit:'30-21311651-2',
+                email:'edesur@algo',
+                web:'www.edesur.com',
+                calle:'algun lugar',
+                altura:'123',
+                piso:'1',
+                localidad:'Capital Federal',
+                codigoPostal:'1321',
+                posIva:2,
+                fechaAlta:'',
+                telefonos:[],
+            },
+            contactos:[{
+                orden:'0',
+                nombre:'Juan',
+                apellido:'Perez',
+                area:'enegia',
+                cargo:'Gerente',
+                telefono:'4121312',
+                mail:'pejuan@edesur',
+                rubro:''
+            },
+            {
+                orden:'1',
+                nombre:'Alan',
+                apellido:'Diaz',
+                area:'enegia',
+                cargo:'Gerente',
+                telefono:'4121312',
+                mail:'aldiz@edesur',
+                rubro:''
+            },
+            {
+                orden:'',
+                nombre:'',
+                apellido:'',
+                area:'',
+                cargo:'',
+                telefono:'',
+                mail:'',
+                rubro:''
+            }
+            ]
+
+        },
+        3:{
+            cliente:{
+                numeroCliente:3,
+                razon:'',
+                nombreFantasia:'Aisa',
+                cuit:'34-21311651-2',
+                email:'aisr@algo',
+                web:'www.ais.com',
+                calle:'algun lugar',
+                altura:'123',
+                piso:'1',
+                localidad:'Capital Federal',
+                codigoPostal:'1321',
+                posIva:2,
+                fechaAlta:'',
+                telefonos:[],
+            },
+            contactos:[{
+                orden:'0',
+                nombre:'Juan',
+                apellido:'Perez',
+                area:'enegia',
+                cargo:'Gerente',
+                telefono:'4121312',
+                mail:'pejuan@edesur',
+                rubro:''
+            },
+            {
+                orden:'1',
+                nombre:'Alan',
+                apellido:'Diaz',
+                area:'enegia',
+                cargo:'Gerente',
+                telefono:'4121312',
+                mail:'aldiz@edesur',
+                rubro:''
+            },
+            {
+                orden:'',
+                nombre:'',
+                apellido:'',
+                area:'',
+                cargo:'',
+                telefono:'',
+                mail:'',
+                rubro:''
+            }
+            ]
+
+        
+            
+        }
+    }
+
+    pedir_posiciones_frente_al_iva(fun){
+        if( fun ){
+            fun(this.posicionesFrenteIva);
+        }
+    }
+
+
+    pedir_clientes(fun){
+        if( fun ){
+            fun(this.clientes);
+        }
+    }
+
+    pedir_datos_cliente(fun,id){
+        if( fun ){
+            fun(this.datosClientes[id])
         }
     }
 

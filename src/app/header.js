@@ -3,42 +3,9 @@ import React from "react";
 import db from './dbHandler.js';
 import injectTapPlugin from 'react-tap-event-plugin';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
-import {TextField,Paper,RaisedButton,AppBar,Drawer} from 'material-ui';
+import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material-ui';
 import edicionCliente from './clientes/edicionCliente.js';
 import listaClientes from './clientes/listaClientes.jsx';
-
-
-
-
-class Header extends React.Component{
-
-    constructor(props){
-        super(props);
-        this.cambiarEstado = props.cambiarEstado;
-    }
-
-
-    funcionOnClick(fun){
-        this.boton.onclick =fun; 
-    }
-
-
-    render(){
-        return (
-            <header className="mdc-toolbar mdc-elevation--z4" >
-                    <div className="mdc-toolbar__row">
-                        <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-                            <button ref={(elem) => {this.boton = elem}} style={{background:"none",boxSizing:"border-box"}}
-                                className="material-icons mdc-toolbar__icon--menu" onClick={this.cambiarEstado}>menu</button>
-                            <span ref ={(elem) => {this.titulo = elem;}} id="titulo" className="mdc-toolbar__title catalog-title">Home</span>
-                        </section>
-                    </div>
-            </header>)
-    }
-}
-
-
-
 
 
 class Nav extends React.Component{
@@ -59,8 +26,6 @@ class Nav extends React.Component{
 
     crearLista(){
         let lista = [
-            {nombre:'Edicion Cliente',
-            funcion:()=>edicionCliente()},
             {nombre:'Clientes',
             funcion:()=>listaClientes()},
         ];
@@ -84,9 +49,9 @@ class Nav extends React.Component{
         if(this.state.render){
             lista = this.crearLista();
         }
-        return lista.map((opcion,index) => (<a className="mdc-list-item" 
-        ref={(elem)=>{if(elem)elem.addEventListener("click",()=>{this.setState({titulo:opcion.nombre}); opcion.funcion()})}}
-        key={index.toString()}>{opcion.nombre}</a>));
+        return lista.map((opcion,index) => (<ListItem className="mdc-list-item" 
+        onClick={()=>{this.setState({titulo:opcion.nombre}); opcion.funcion(); this.cambiarEstado()}}
+        key={index.toString()}>{opcion.nombre}</ListItem>));
     }
 
     devolverNav(){
@@ -99,7 +64,9 @@ class Nav extends React.Component{
                 <div>
                     <AppBar title={this.state.titulo} onLeftIconButtonTouchTap={this.cambiarEstado} />
                     <Drawer docked={false} width={300} open={this.state.abierto} onRequestChange={this.cambiarEstado} >
-                        {this.generarListado()}
+                        <List>
+                            {this.generarListado()}
+                        </List>
                     </Drawer>
                 </div>
             </MUICont>

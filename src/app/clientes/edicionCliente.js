@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,SelectField,RaisedButton,Paper,
         MenuItem,Tab,Tabs} from 'material-ui'
+import DBHandler from '../dbHandler';
 
 export default function main(){
     
@@ -24,9 +25,13 @@ export class EdicionCliente extends Component{
     constructor(props){
 
         super(props);
+        let numeroCliente = ''
+        if(props.numeroCliente){
+            numeroCliente = props.numeroCliente;
+        }
         this.state={
             cliente:{
-                numeroCliente:'',
+                numeroCliente:numeroCliente,
                 razon:'',
                 nombreFantasia:'',
                 cuit:'',
@@ -38,7 +43,7 @@ export class EdicionCliente extends Component{
                 piso:'',
                 localidad:'', //pienso hacerlo id para vincularlo de forma fija, ayudando a posteriores busquedas
                 codigoPostal:'',
-                posIva:'',//idem localidad, puedo sacarlas de la pagina de afip de facturacion
+                posIva:0,//idem localidad, puedo sacarlas de la pagina de afip de facturacion
                 fechaAlta:'',
             },
             contactos:[{orden:'',
@@ -48,15 +53,119 @@ export class EdicionCliente extends Component{
                 cargo:'',
                 telefono:'',
                 mail:'',
-                rubro:'',}],
+                rubro:'',},
+                {orden:'',
+                nombre:'',
+                apellido:'',
+                area:'',
+                cargo:'',
+                telefono:'',
+                mail:'',
+                rubro:'',},
+                {orden:'',
+                nombre:'',
+                apellido:'',
+                area:'',
+                cargo:'',
+                telefono:'',
+                mail:'',
+                rubro:'',}
+            ],
 
             tiposIVAS:[],
             localidades:[],
         }
+
+        this.db = new DBHandler();
+        this.cargarIvas = this.cargarIvas.bind(this);
+        this.cargarCliente = this.cargarCliente.bind(this);
+
     }
+
+    cargarLocalidades(datos){
+        this.setState({localidades:datos});
+    }
+    
+    cargarIvas(datos){
+        this.setState({tiposIVAS:datos});
+    }
+
+    cargarCliente(datos){{
+        this.setState(
+            {cliente:datos.cliente,contactos:datos.contactos}
+            )
+        }
+
+    }
+
+    componentDidMount(){
+        this.db.pedir_posiciones_frente_al_iva(this.cargarIvas);
+        if(this.state.cliente.numeroCliente != '' && this.state.cliente.numeroCliente != 'NUEVO'){
+            this.db.pedir_datos_cliente(this.cargarCliente,this.state.cliente.numeroCliente);
+        }
+    }
+
+
 
     actualizar(valor,campo){
         this.setState({campo:valor})
+    }
+
+    componentWillReceiveProps(props){
+        if(props.numeroCliente){
+            
+            if(props.numeroCliente === 'NUEVO'){
+               
+                this.setState(
+                    {
+                    cliente:{
+                        numeroCliente:'',
+                        razon:'',
+                        nombreFantasia:'',
+                        cuit:'',
+                        telefonos:[],
+                        mail:'',
+                        web:'',
+                        calle:'',
+                        altura:'',
+                        piso:'',
+                        localidad:'', //pienso hacerlo id para vincularlo de forma fija, ayudando a posteriores busquedas
+                        codigoPostal:'',
+                        posIva:0,//idem localidad, puedo sacarlas de la pagina de afip de facturacion
+                        fechaAlta:'',
+                    },
+                    contactos:[{orden:'',
+                        nombre:'',
+                        apellido:'',
+                        area:'',
+                        cargo:'',
+                        telefono:'',
+                        mail:'',
+                        rubro:'',},{orden:'',
+                        nombre:'',
+                        apellido:'',
+                        area:'',
+                        cargo:'',
+                        telefono:'',
+                        mail:'',
+                        rubro:'',},{orden:'',
+                        nombre:'',
+                        apellido:'',
+                        area:'',
+                        cargo:'',
+                        telefono:'',
+                        mail:'',
+                        rubro:'',}
+                    ],
+
+                })
+                return;
+            }
+            else{
+                this.db.pedir_datos_cliente(this.cargarCliente,props.numeroCliente);
+                
+            }
+        }
     }
 
     render(){
@@ -84,8 +193,6 @@ export class EdicionCliente extends Component{
     }
 
 }
-
-//avisar al 143
 
 
 class Cliente extends Component{
@@ -141,17 +248,20 @@ class Cliente extends Component{
     }
 
     actualizar(evento){
+        if(evento.target.name==='posIva'){
+            console.log(evento);
+        }
 
         this.setState({[evento.target.name]:evento.target.value});
     }
 
     tiposIvas(){
-        return this.state.tiposIVAS.map((elem,index)=>( <MenuItem value={index} primaryText={elem}/> ))
+        return this.state.tiposIVAS.map((elem,index)=>( <MenuItem value={index + 1} primaryText={elem} key={index}/> ))
     }
 
 
     render(){
-
+        console.log(this.state.localidad);
 
         return(
             <Paper style={{width:'400px'}} >
@@ -187,7 +297,7 @@ class Cliente extends Component{
                     onChange={this.actualizar} name='codigoPostal' />
                     <br/>
                     <SelectField onChange={(event,index,value)=>{this.actualizar({target:{value:value,name:'posIva'}})}} 
-                        floatingLabelText={ <label htmlFor="">Posición frente al IVA</label> }>
+                        floatingLabelText={ <label htmlFor="">Posición frente al IVA</label>} value={this.state.posIva} >
                         {this.tiposIvas()}
                     </SelectField>
                     <br/>
@@ -313,7 +423,8 @@ class Contactos extends Component{
     actualizar(info,index){
         let contactos = this.state.contactos;
         contactos[index] = info;
-        this.setState({contactos:contactos});
+        //this.setState({contactos:contactos});
+        this.actualizarPadre(contactos,'contactos')
     }
 
     componentWillReceiveProps(props){
@@ -322,12 +433,20 @@ class Contactos extends Component{
         })
     }
 
+    crearNombre(nombre, apellido){
+        let nombreFinal = nombre + ' ' + apellido;
+        if(nombreFinal.length === 1){
+            nombreFinal = 'Contacto';
+        }
+        return nombreFinal;
+    }
+
     cargarContactos(){
         let lista = this.state.contactos;
-        lista = lista.map((elem,index)=>( <Tab label={elem.nombre + ' ' + elem.apellido}  >
+        lista = lista.map((elem,index)=>( <Tab label={this.crearNombre(elem.nombre,elem.apellido)} key={index} >
             <Contacto orden={index} nombre={elem.nombre} apellido={elem.apellido} 
             area={elem.area} cargo={elem.cargo} telefono={elem.telefono} mail={elem.mail} rubro={elem.rubro}
-            funAct={this.actualizar} />
+            funAct={this.actualizar} indice={index}/>
             </Tab>) )
         if(lista.length < 3){
             lista.push(<Tab />)
@@ -363,6 +482,7 @@ class Contacto extends Component{
             telefono:props.telefono,
             mail:props.mail,
             rubro:props.rubro,
+            indice:props.indice,
         }
 
         this.actualizarPadre = props.funAct;
@@ -379,14 +499,15 @@ class Contacto extends Component{
             telefono:props.telefono,
             mail:props.mail,
             rubro:props.rubro,
+            indice:props.indice,
         })
     }
 
     actualizar(evento){
-        this.setState({[evento.target.name]:evento.target.value});
+        //this.setState({[evento.target.name]:evento.target.value});
         let datos = this.state;
         datos[evento.target.name] = evento.target.value;
-        this.actualizarPadre(datos);
+        this.actualizarPadre(datos,this.state.indice);
     }
 
     render(){
