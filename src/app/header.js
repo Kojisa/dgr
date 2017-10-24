@@ -94,11 +94,9 @@ class Login extends React.Component{
         this.db.pedir_usuario(this.cargar_usuario,this.state.us,this.state.pas);
     }
     cargar_usuario(datos){
-        let token = datos['token']
-        if(token == null) {
+        if('error' in datos){
             return;
         }
-        document.cookie ='auth='+token
         this.state.onLogin()
     }
 
@@ -134,8 +132,8 @@ export default class main extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            render:true,
-            loged:true,
+            render:false,
+            loged:false,
             estadoNav:false,
         }
         this.logueado = this.logueado.bind(this);

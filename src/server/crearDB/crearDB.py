@@ -42,6 +42,11 @@ tablas={
         'id':'INT',
         'cliente':'INT',
         'balance':'float(10,2)'
+    },
+    'usuarios':{
+        'id':'INT',
+        'usuario':'VARCHAR(20)',
+        'contra':'VARCHAR(20)'
     }
 }
 

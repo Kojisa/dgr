@@ -41,8 +41,7 @@ class Contenedor extends Component{
         this.cargarClientes = this.cargarClientes.bind(this);
         this.pedirClientes = this.pedirClientes.bind(this);
         this.actualizarDatos = this.actualizarDatos.bind(this);
-        //this.db.pedir_clientes(this.cargarClientes);
-
+        this.pedirClientes();
     }
 
     actualizarDatos(valor,campo){
@@ -63,37 +62,35 @@ class Contenedor extends Component{
 
     }
 
-    componentDidMount(){
-        this.pedirClientes();
-    }
-
     generarListado(){
 
         let lista = this.state.clientes;
 
         return lista.map((elem,index)=>
             {
-            if( elem.nombre.toLowerCase().includes(this.state.filtro.toLowerCase()) || this.state.filtro === ''){return <Cliente nombre={elem.nombre} 
-            letra={elem.letra} id={elem.id} 
-            funAct={this.actualizarDatos} key={index}/>}
+                if( elem.nombre.toLowerCase().includes(this.state.filtro.toLowerCase()) || this.state.filtro === ''){return <Cliente nombre={elem.nombre} 
+                letra={elem.letra} id={elem.id} 
+                funAct={this.actualizarDatos} key={index}/>}
             }
         )
     }
 
 
     render(){
-        let edicion = <EdicionCliente  numeroCliente = {this.state.actual}></EdicionCliente>
+        let edicion = <EdicionCliente actLista={this.pedirClientes} numeroCliente = {this.state.actual}></EdicionCliente>
         if( this.state.mostrarEdicion === false){
             edicion = null;
         }
         return(
             <div>
-                <Paper style={{width:'400px',display:'inline-block'}} >
+                <Paper style={{width:'400px',display:'inline-block',margin:'5px'}} >
+                    <div style={{margin:'5px'}} >
                     <TextField floatingLabelText={ <label>Busqueda</label> } 
                     onChange={(evento)=>this.actualizarDatos(evento.target.value,evento.target.name)
                     } name='filtro' ></TextField>
                     <RaisedButton label={'Nuevo'} primary={true} onClick={()=>(this.actualizarDatos('NUEVO','actual'))}/>
                     <br/>
+                    </div>
                     <div style={{margin:'5px'}} >
                         <List>
                             {this.generarListado()}

@@ -1,7 +1,7 @@
 export default class DBHandler{
     
     PORT = ':1400';
-    HOST = '154.2.15.24';
+    HOST = '138.219.40.2';
 
     clientes=[
         {nombre:'Edesur',letra:'E',id:1},
@@ -168,26 +168,27 @@ export default class DBHandler{
         }
     }
 
+    pedir_usuario(fun,us,pas){
+        this.enviarPeticion(fun,'usuario','POST',{'usuario':us,'contra':pas},false,false);
+    }
+
     pedir_posiciones_frente_al_iva(fun){
-        if( fun ){
-            fun(this.posicionesFrenteIva);
-        }
+        this.enviarPeticion(fun,'tiposIvas','GET',null,true,false);
     }
 
 
     pedir_clientes(fun){
-        if( fun ){
-            fun(this.clientes);
-        }
+        this.enviarPeticion(fun,'listadoClientes','GET',null,true,false);
     }
 
     pedir_datos_cliente(fun,id){
-        if( fun ){
-            fun(this.datosClientes[id])
-        }
+        this.enviarPeticion(fun,'devolverCliente','POST',id,true,false);
+        
     }
 
-
+    guardar_datos_cliente(fun,datos){
+        this.enviarPeticion(fun,'guardarCliente','POST',datos,true,false);
+    }
 
     
     enviarPeticion(fun,url,metodo,datos,asinc=true,auth=true){

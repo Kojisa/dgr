@@ -26,7 +26,7 @@ export class EdicionCliente extends Component{
 
         super(props);
         let numeroCliente = ''
-        if(props.numeroCliente){
+        if(props.numeroCliente && props.numeroCliente != 'NUEVO'){
             numeroCliente = props.numeroCliente;
         }
         this.state={
@@ -35,7 +35,6 @@ export class EdicionCliente extends Component{
                 razon:'',
                 nombreFantasia:'',
                 cuit:'',
-                telefonos:[],
                 mail:'',
                 web:'',
                 calle:'',
@@ -46,7 +45,7 @@ export class EdicionCliente extends Component{
                 posIva:0,//idem localidad, puedo sacarlas de la pagina de afip de facturacion
                 fechaAlta:'',
             },
-            contactos:[{orden:'',
+            contactos:[{orden:0,
                 nombre:'',
                 apellido:'',
                 area:'',
@@ -54,7 +53,7 @@ export class EdicionCliente extends Component{
                 telefono:'',
                 mail:'',
                 rubro:'',},
-                {orden:'',
+                {orden:1,
                 nombre:'',
                 apellido:'',
                 area:'',
@@ -62,7 +61,7 @@ export class EdicionCliente extends Component{
                 telefono:'',
                 mail:'',
                 rubro:'',},
-                {orden:'',
+                {orden:2,
                 nombre:'',
                 apellido:'',
                 area:'',
@@ -79,6 +78,10 @@ export class EdicionCliente extends Component{
         this.db = new DBHandler();
         this.cargarIvas = this.cargarIvas.bind(this);
         this.cargarCliente = this.cargarCliente.bind(this);
+        this.guardarDatos = this.guardarDatos.bind(this);
+        this.actualizarNumeroCliente = this.actualizarNumeroCliente.bind(this);
+        this.actualizar = this.actualizar.bind(this);
+        this.actualizarListaPadre = props.actLista;
 
     }
 
@@ -108,10 +111,11 @@ export class EdicionCliente extends Component{
 
 
     actualizar(valor,campo){
-        this.setState({campo:valor})
+        this.setState({[campo]:valor})
     }
 
     componentWillReceiveProps(props){
+
         if(props.numeroCliente){
             
             if(props.numeroCliente === 'NUEVO'){
@@ -123,7 +127,6 @@ export class EdicionCliente extends Component{
                         razon:'',
                         nombreFantasia:'',
                         cuit:'',
-                        telefonos:[],
                         mail:'',
                         web:'',
                         calle:'',
@@ -134,21 +137,21 @@ export class EdicionCliente extends Component{
                         posIva:0,//idem localidad, puedo sacarlas de la pagina de afip de facturacion
                         fechaAlta:'',
                     },
-                    contactos:[{orden:'',
+                    contactos:[{orden:0,
                         nombre:'',
                         apellido:'',
                         area:'',
                         cargo:'',
                         telefono:'',
                         mail:'',
-                        rubro:'',},{orden:'',
+                        rubro:'',},{orden:1,
                         nombre:'',
                         apellido:'',
                         area:'',
                         cargo:'',
                         telefono:'',
                         mail:'',
-                        rubro:'',},{orden:'',
+                        rubro:'',},{orden:2,
                         nombre:'',
                         apellido:'',
                         area:'',
@@ -168,6 +171,21 @@ export class EdicionCliente extends Component{
         }
     }
 
+    actualizarNumeroCliente(datos){
+        let numeroCliente = datos['numeroCliente'];
+        let fechaAlta = datos['fechaAlta'];
+        let cliente = this.state.cliente;
+        cliente.numeroCliente = numeroCliente;
+        cliente.fechaAlta = fechaAlta
+        this.setState({cliente:cliente});
+        this.actualizarListaPadre();
+    }
+
+    guardarDatos(){
+        this.db.guardar_datos_cliente(this.actualizarNumeroCliente,
+        {cliente:this.state.cliente,contactos:this.state.contactos});
+    }
+
     render(){
 
         return(
@@ -177,9 +195,9 @@ export class EdicionCliente extends Component{
                         <div style={{display:'inline-block', verticalAlign:'top', margin:'5px'}}>
                             <Cliente numeroCliente={this.state.cliente.numeroCliente} razon={this.state.cliente.razon} nombreFantasia={this.state.cliente.nombreFantasia} 
                             cuit={this.state.cliente.cuit} telefonos={this.state.cliente.telefonos} mail={this.state.cliente.mail} web={this.state.cliente.web} 
-                            calle={this.state.cliente.calle} altura={this.state.cliente.altura} piso={this.state.cliente.piso} localidad={this.state.localidad} 
+                            calle={this.state.cliente.calle} altura={this.state.cliente.altura} piso={this.state.cliente.piso} localidad={this.state.cliente.localidad} 
                             codigoPostal={this.state.cliente.codigoPostal} posIva={this.state.cliente.posIva} fechaAlta={this.state.cliente.fechaAlta} 
-                            tiposIVAS={this.state.tiposIVAS} localidades={this.state.localidades}/>
+                            tiposIVAS={this.state.tiposIVAS} localidades={this.state.localidades} funAct={this.actualizar}/>
                         </div>
                     </Tab>
                     <Tab label='Contactos' >
@@ -188,6 +206,8 @@ export class EdicionCliente extends Component{
                         </div>
                     </Tab>
                 </Tabs>
+                <RaisedButton label='Guardar' primary={true} style={{marginLeft:'5px'}}
+                onClick={this.guardarDatos}/>
             </div>  
         )
     }
@@ -222,6 +242,7 @@ class Cliente extends Component{
 
         this.actualizar = this.actualizar.bind(this);
         this.tiposIvas = this.tiposIvas.bind(this);
+        this.actualizarPadre = props.funAct;
     }
 
     componentWillReceiveProps(props){
@@ -230,7 +251,6 @@ class Cliente extends Component{
             razon:props.razon,
             nombreFantasia:props.nombreFantasia,
             cuit:props.cuit,
-            telefonos:props.telefonos,
             mail:props.mail,
             web:props.web,
             calle:props.calle,
@@ -240,7 +260,7 @@ class Cliente extends Component{
             codigoPostal:props.codigoPostal,
             posIva:props.posIva,//idem localidad, puedo sacarlas de la pagina de afip de facturacion
             fechaAlta:props.fechaAlta,
-
+            
             tiposIVAS:props.tiposIVAS,//se pide al servidor, es para el selector
             localidades:props.localidades,//idem tiposivas
         })
@@ -248,21 +268,21 @@ class Cliente extends Component{
     }
 
     actualizar(evento){
-        if(evento.target.name==='posIva'){
-            console.log(evento);
-        }
 
-        this.setState({[evento.target.name]:evento.target.value});
+        let datos = this.state;
+        delete datos['tiposIVAS'];
+        delete datos['localidades'];
+        datos[evento.target.name] = evento.target.value;
+        //this.setState({[evento.target.name]:evento.target.value});
+        this.actualizarPadre(datos,'cliente');
     }
 
     tiposIvas(){
-        return this.state.tiposIVAS.map((elem,index)=>( <MenuItem value={index + 1} primaryText={elem} key={index}/> ))
+        return this.state.tiposIVAS.map((elem,index)=>( <MenuItem value={elem.id} primaryText={elem.descripcion} key={index}/> ))
     }
 
 
     render(){
-        console.log(this.state.localidad);
-
         return(
             <Paper style={{width:'400px'}} >
                 <div style={{margin:'5px'}}>
@@ -301,8 +321,7 @@ class Cliente extends Component{
                         {this.tiposIvas()}
                     </SelectField>
                     <br/>
-                    <Telefonos telefonos={this.state.telefonos} funAct={this.actualizar} />
-                    <RaisedButton label='Guardar' primary={true} />
+                   
                 </div>
             </Paper>
         )
@@ -446,7 +465,7 @@ class Contactos extends Component{
         lista = lista.map((elem,index)=>( <Tab label={this.crearNombre(elem.nombre,elem.apellido)} key={index} >
             <Contacto orden={index} nombre={elem.nombre} apellido={elem.apellido} 
             area={elem.area} cargo={elem.cargo} telefono={elem.telefono} mail={elem.mail} rubro={elem.rubro}
-            funAct={this.actualizar} indice={index}/>
+            funAct={this.actualizar}/>
             </Tab>) )
         if(lista.length < 3){
             lista.push(<Tab />)
@@ -482,11 +501,11 @@ class Contacto extends Component{
             telefono:props.telefono,
             mail:props.mail,
             rubro:props.rubro,
-            indice:props.indice,
         }
 
         this.actualizarPadre = props.funAct;
         this.actualizar = this.actualizar.bind(this);
+        this.borrar = this.borrar.bind(this);
     }
 
     componentWillReceiveProps(props){
@@ -499,15 +518,28 @@ class Contacto extends Component{
             telefono:props.telefono,
             mail:props.mail,
             rubro:props.rubro,
-            indice:props.indice,
         })
+    }
+
+    borrar(){
+        let estado = {
+            orden:this.state.orden,
+            nombre:'',
+            apellido:'',
+            area:'',
+            cargo:'',
+            telefono:'',
+            mail:'',
+            rubro:'',
+        }
+        this.actualizarPadre(estado,this.state.orden);
     }
 
     actualizar(evento){
         //this.setState({[evento.target.name]:evento.target.value});
         let datos = this.state;
         datos[evento.target.name] = evento.target.value;
-        this.actualizarPadre(datos,this.state.indice);
+        this.actualizarPadre(datos,this.state.orden);
     }
 
     render(){
@@ -530,7 +562,7 @@ class Contacto extends Component{
                 <TextField value={this.state.mail} onChange={this.actualizar} name='mail'
                 floatingLabelText={ <label htmlFor="">E-Mail</label> } />
                 <br/>
-                <RaisedButton label='Borrar' secondary={true} />
+                <RaisedButton label='Borrar' secondary={true} onClick={this.borrar} />
             </div>
         )
     }
