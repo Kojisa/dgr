@@ -1,5 +1,6 @@
 #coding:latin-1
-from bottle import template, route, run, response, Bottle, hook, request,static_file,post,default_app
+from bottle import template, route, run, response, Bottle, \
+ServerAdapter,server_names, hook, request,static_file,post,default_app
 from json import dumps,loads
 import dbServer
 import datetime
@@ -145,4 +146,20 @@ def login():
     return dumps(permisos)
 
 
-run(host="localhost", port=1400)
+class SSLWebServer(ServerAdapter):
+
+    def run(self, handler):
+        from cherrypy import wsgiserver
+        from cherrypy.wsgiserver.ssl_pyopenssl import pyOpenSSLAdapter
+        
+
+        server = wsgiserver.CherryPyWSGIServer((self.host,self.port), handler)
+
+        try:
+            server.start()
+        except:
+            server.stop()
+
+server_names['sslwebserver'] = SSLWebServer
+
+run(host="0.0.0.0",port=1400,server='sslwebserver')
