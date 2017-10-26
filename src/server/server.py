@@ -47,21 +47,21 @@ def devolverPagina():
 def guardarCliente():
     datos = request.json['datos']
 
-    ordenAgregarCliente = 'INSERT INTO CLIENTES(razon,nombreFantasia,cuit,mail,web,\
+    ordenAgregarCliente = 'INSERT INTO clientes(razon,nombreFantasia,cuit,mail,web,\
      calle,altura,piso,localidad,codigoPostal,posIva,fechaAlta) values(%(razon)s,\
      %(nombreFantasia)s, %(cuit)s, %(mail)s, %(web)s, %(calle)s, %(altura)s, %(piso)s,\
      %(localidad)s, %(codigoPostal)s, %(posIva)s, %(fechaAlta)s );'
 
-    ordenActualizarCliente = 'UPDATE CLIENTES SET razon = %(razon)s,\
+    ordenActualizarCliente = 'UPDATE clientes SET razon = %(razon)s,\
      nombreFantasia = %(nombreFantasia)s, cuit = %(cuit)s, mail = %(mail)s, web = %(web)s,\
      calle = %(calle)s, altura = %(altura)s, piso = %(piso)s, localidad = %(localidad)s,\
      codigoPostal = %(codigoPostal)s, posIva = %(posIva)s, fechaAlta = %(fechaAlta)s where \
      id = %(numeroCliente)s;'
 
-    crearContacto = 'INSERT INTO CONTACTOS (cliente,nombre,apellido,area,cargo,telefono,\
+    crearContacto = 'INSERT INTO contactos (cliente,nombre,apellido,area,cargo,telefono,\
     mail,rubro,orden) values(%s,%s,%s,%s,%s,%s,%s,%s,%s);'
 
-    actualizarContacto = 'UPDATE CONTACTOS set nombre = %(nombre)s, apellido = %(apellido)s,\
+    actualizarContacto = 'UPDATE contactos set nombre = %(nombre)s, apellido = %(apellido)s,\
     area = %(area)s, cargo = %(cargo)s, telefono = %(telefono)s, mail = %(mail)s, rubro = %(rubro)s\
      where orden = %(orden)s and cliente = %(cliente)s;'
 
