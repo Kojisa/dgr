@@ -18,7 +18,7 @@ tablas={
         'calle':'VARCHAR(40)',
         'altura':'VARCHAR(8)',
         'piso':'VARCHAR(4)',
-        'localidad':'VARCHAR(30)',
+        'localidad':'VARCHAR(40)',
         'codigoPostal':'VARCHAR(10)',
         'posIva':'INT',
         'fechaAlta':'DATETIME'

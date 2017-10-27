@@ -290,31 +290,31 @@ class Cliente extends Component{
                     onChange={this.actualizar} name='numeroCliente' disabled/>
                     <br/>
                     <TextField value={this.state.razon} floatingLabelText={ <label htmlFor="">Razón Social</label> } 
-                    onChange={this.actualizar} name='razon'/>
+                    onChange={this.actualizar} name='razon' maxLength={100}/>
                     <TextField value={this.state.nombreFantasia} floatingLabelText={ <label htmlFor="">Nombre Fantasia</label> }
-                    onChange={this.actualizar} name='nombreFantasia' />
+                    onChange={this.actualizar} name='nombreFantasia' maxLength={70}/>
                     <br/>
                     <TextField value={this.state.cuit} floatingLabelText={ <label htmlFor="">CUIT</label> }
-                    onChange={this.actualizar} name='cuit' />
+                    onChange={this.actualizar} name='cuit' maxLength={18}/>
                     <br/>
                     <TextField value={this.state.mail} floatingLabelText={ <label htmlFor="">E-Mail</label> } 
-                    onChange={this.actualizar} name='mail'/>
+                    onChange={this.actualizar} name='mail' maxLength={40} />
                     <TextField value={this.state.web} floatingLabelText={ <label htmlFor="">Web</label> }
-                    onChange={this.actualizar} name='web' />
+                    onChange={this.actualizar} name='web' maxLength={40}/>
                     <br/>
                     <span>Domicilio</span>
                     <br/>
                     <TextField value={this.state.calle} floatingLabelText={ <label htmlFor="">Calle</label> }
-                    onChange={this.actualizar} name='calle' />
+                    onChange={this.actualizar} name='calle' maxLength={40}/>
                     <TextField value={this.state.altura} floatingLabelText={ <label htmlFor="">Altura</label> }
-                    onChange={this.actualizar} name='altura' style={{width:'80px'}} />
+                    onChange={this.actualizar} name='altura' style={{width:'80px'}} maxLength={8} />
                     <TextField value={this.state.piso} floatingLabelText={ <label htmlFor="">Piso</label> }
-                    onChange={this.actualizar} name='piso' style={{width:'40px'}} ></TextField>
+                    onChange={this.actualizar} name='piso' style={{width:'40px'}} maxLength={4} ></TextField>
                     <br/>
                     <TextField value={this.state.localidad} floatingLabelText={ <label htmlFor="">Localidad</label> }
-                    onChange={this.actualizar} name='localidad' />
+                    onChange={this.actualizar} name='localidad' maxLength={40}/>
                     <TextField value={this.state.codigoPostal} floatingLabelText={ <label htmlFor="">CP</label> }
-                    onChange={this.actualizar} name='codigoPostal' />
+                    onChange={this.actualizar} name='codigoPostal' maxLength={10} />
                     <br/>
                     <SelectField onChange={(event,index,value)=>{this.actualizar({target:{value:value,name:'posIva'}})}} 
                         floatingLabelText={ <label htmlFor="">Posición frente al IVA</label>} value={this.state.posIva} >
@@ -547,20 +547,20 @@ class Contacto extends Component{
         return(
             <div>
                 <TextField value={this.state.nombre} onChange={this.actualizar} name='nombre' 
-                floatingLabelText={<label htmlFor="">Nombre</label> } style={{width:'150px'}} />
+                floatingLabelText={<label htmlFor="">Nombre</label> } style={{width:'150px'}} maxLength={30}/>
                 <TextField value={this.state.apellido} onChange={this.actualizar} name='apellido' 
-                floatingLabelText={ <label htmlFor="">Apellido</label> } style={{width:'150px'}} />
+                floatingLabelText={ <label htmlFor="">Apellido</label> } style={{width:'150px'}} maxLength={30}/>
                 <br/>
                 <TextField value={this.state.area} onChange={this.actualizar} name='area'
-                floatingLabelText={ <label htmlFor="">Area</label> } style={{width:'150px'}} />
+                floatingLabelText={ <label htmlFor="">Area</label> } style={{width:'150px'}} maxLength={30} />
                 <TextField value={this.state.cargo} onChange={this.actualizar} name='cargo'
-                floatingLabelText={ <label htmlFor="">Cargo</label>} style={{width:'150px'}} />
+                floatingLabelText={ <label htmlFor="">Cargo</label>} style={{width:'150px'}} maxLength={30}/>
                 <br/>
                 <TextField value={this.state.telefono} onChange={this.actualizar} name='telefono'
-                floatingLabelText={ <label htmlFor="">Telefono</label> } style={{width:'150px'}} />
+                floatingLabelText={ <label htmlFor="">Telefono</label> } style={{width:'150px'}} maxLength={30}/>
                 <br/>
                 <TextField value={this.state.mail} onChange={this.actualizar} name='mail'
-                floatingLabelText={ <label htmlFor="">E-Mail</label> } />
+                floatingLabelText={ <label htmlFor="">E-Mail</label> } maxLength={40}/>
                 <br/>
                 <RaisedButton label='Borrar' secondary={true} onClick={this.borrar} />
             </div>
