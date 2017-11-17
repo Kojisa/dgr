@@ -47,6 +47,65 @@ tablas={
         'id':'INT',
         'usuario':'VARCHAR(20)',
         'contra':'VARCHAR(20)'
+    },
+    'presupuestos':{
+        'id':'INT',
+        'cliente':'INT',
+        'aprobado':'BOOL'
+    },
+    'pagosPresupuestos':{
+        'id':'INT',
+        'fecha':'DATETIME',
+        'monto':'FLOAT(10,2)'
+    },
+    'responsables':{ #para saber a quen le corresponde hacerse cargo del item
+        'id':'INT',
+        'descripcion':'VARCHAR(30)'
+    },
+    'comentariosItems':{
+        'id':'INT',
+        'item':'INT',
+        'fecha':'INT',
+        'usuario':'INT',
+        'comentario':'VARCHAR(400)'
+    },
+    'requisitosItemPresupuesto':{
+        'item':'INT',
+        'requisito':'INT',
+        'completo':'BOOL',
+    },
+    'areas':{
+        'id':'INT',
+        'descripcion':'VARCHAR(50)',
+    },
+    'itemsPresupuesto':{
+        'id':'INT',
+        'area':'INT',
+        'presupuesto':'INT',
+        'descripcion':'VARCHAR(100)',
+        'precio':'float(10,2)', #prefijo el precio por si cambia en el futuro
+        'responsable':'INT',
+        'organismo':'INT',#para identificar si es un tercero el que se hace cargo
+        'completo':'BOOL',
+        'fechaCompletado':'datetime',
+        'pago':'BOOL',
+        'estado':'VARCHAR(60)',
+    },
+    'estadosItems':{
+        'item':'INT',
+        'id':'INT',
+        'descripcion':'VARCHAR(40)',
+        'completaItem':'BOOL'
+    },
+    'items':{
+        'id':'INT',
+        'area':'INT',
+        'descripcion':'INT',
+        'precio':'float(10,2)',
+        'requisitos':'VARCHAR(100)',#almaceno como string la lista de items requisitos
+        'tipo':'INT',#esto es para determinar si es una variable que almacena dato, o tiene estados
+        'defaultACargo':'INT',#no se si lo voy a usar, pero es por si quiero setear un valor por default de quien se hacer cargo
+        'estado':'INT'
     }
 }
 
