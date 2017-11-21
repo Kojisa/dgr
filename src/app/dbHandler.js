@@ -1,7 +1,7 @@
 export default class DBHandler{
     
     PORT = ':1400';
-    HOST = 'localhost';
+    HOST = '138.219.40.2';
 
 
     posicionesFrenteIva=['Responsable Inscripto','Monotributista','Exento',

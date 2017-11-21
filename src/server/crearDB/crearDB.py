@@ -4,6 +4,7 @@ from mysql.connector import errorcode
 
 HOST = "localhost"
 USER = "root"
+PORT = '1900'
 PASS = '1991'
 DBNAME = "gest_planes"
 
@@ -173,7 +174,7 @@ def borrarBase():
 def conectar():
 
     try:
-        con = CON.connect(host=HOST,user=USER,password=PASS)
+        con = CON.connect(host=HOST,user=USER,password=PASS,port=PORT)
 
     except:
         print("No se pudo realizar la conexion con la base de datos")
