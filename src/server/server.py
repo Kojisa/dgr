@@ -34,6 +34,142 @@ def dummy():
     return
 
 
+#########################################################################################
+#                                  PLANES                                               #
+#########################################################################################
+
+@route('/planes',method='GET')
+def devolverPlanes():
+    
+
+
+
+
+#########################################################################################
+#                                  AREAS                                                #
+#########################################################################################
+
+@route('/areas',method='GET')
+def devolverAreas():
+
+    ordenAreas = 'select id,descripcion from areas;'
+    areas =db.contestarQuery(ordenAreas)
+    return dumps({'areas':areas})
+
+@route('/area/agregar',method='POST')
+def agregarArea():
+
+    datos = request.json['datos']
+
+    orden = 'insert into areas(descripcion) values(%(descripcion)s);'
+    
+    db.contestarQuery(orden,datos,False)
+    db.aceptarCambios()
+
+@route('/area/editar',method='POST')
+def modificarArea():
+
+    datos = request.json['datos']
+
+    orden = 'update areas set descripcion = %(descripcion)s where id = %(id)s;'
+    db.contestarQuery(orden,datos,False)
+    db.aceptarCambios()
+
+
+#########################################################################################
+#                                  ITEMS                                                #
+#########################################################################################
+
+@route('/items',method='POST')
+def devolverItems():
+    datos = request.json['datos']
+    ordenItems = 'select id,descripcion from items where area = %(area)s'
+    
+    items = db.contestarQuery(ordenItems,datos)
+    return dumps({'items':items })
+
+@route('/item',method='POST')
+def devolverItem():
+    datos = request.json['datos']
+    
+    orden = 'select descripcion,precio,requisitos,tipo from items where id = %(id)s;'
+
+    ordenEstados = 'select id,descripcion,completarItem from estadosItems where item = %(id)s;'
+
+    item = db.contestarQuery(orden,datos)
+
+    item['estados'] = db.contestarQuery(ordenEstados,datos)
+
+
+    return dumps(item)
+
+@route('/item/agregar',method='POST')
+def agregarItem():
+
+    datos = request.json['datos']
+
+    orden = 'insert into items(area,descripcion,precio,requisitos,tipo) \
+    values(%(area)s,%(descripcion)s,%(precio)s,%(requisitos)s,%(tipo)s); '
+
+    db.contestarQuery(orden,datos,False)
+    db.aceptarCambios()
+    idItem = db.ultimaId()
+    
+    ordenEstados = 'insert into estadosItems(descripcion,item,completaItem) \
+    values(%(descripcion)s,%(item)s,%(completaItem)s)'
+
+    for estado in datos['estados']:
+        estado['item'] = idItem
+        db.contestarQuery(ordenEstados,estado,False)
+        db.aceptarCambios()
+    
+    return dumps({'id',idItem})
+
+@route('/item/actualizar',method='POST')
+def actualizarItem():
+
+    datos = request.json['datos']
+
+    orden = 'update items set descripcion = %(descripcion)s, precio = %(precio)s, \
+    requisitos = %(requisitos)s where id = %(id)s;'
+
+    ordenAgregarEstado = 'insert into estadosItems(descripcion,item,completaItem) \
+    values(%(descripcion)s,%(item)s,%(completaItem)s)'
+
+    ordenActualizarEstado = 'update estadosItems set descripcion = %(descripcion)s, \
+    completarItem = %(completarItem)s where id = %(id)s '
+
+    db.contestarQuery(orden,datos,False)
+    db.aceptarCambios()
+
+
+    for estado in datos['estados']:
+        estado['item'] = datos['id']
+        if(estado['id'] == ''):
+            db.contestarQuery(ordenAgregarEstado,estado,False)
+            
+        else:
+            db.contestarQuery(ordenActualizarEstado,estado,False)
+
+        db.aceptarCambios()
+
+@route('/item/anular',method='POST')
+def anularItem():
+
+    datos = response.json['datos']
+
+    orden = 'update items set habilitado = %(habilitado)s where id = %(id)s'
+
+    db.contestarQuery(orden,datos,False)
+    db.aceptarCambios()
+
+
+
+
+#########################################################################################
+#                                  ESTATICOS                                            #
+#########################################################################################
+
 @route('/<modulo>')
 def devolverModulo(modulo):
     return static_file(modulo,root="../../build/")
@@ -42,6 +178,11 @@ def devolverModulo(modulo):
 def devolverPagina():
     return static_file("index.html",root="../../build/")
 
+
+
+#########################################################################################
+#                                  Clientes                                             #
+#########################################################################################
 
 @route('/guardarCliente',method='POST')
 def guardarCliente():
@@ -125,6 +266,13 @@ def devolverCliente():
     cliente['fechaAlta'] = cliente['fechaAlta'].isoformat()
 
     return dumps({'cliente':cliente,'contactos':contactos})
+
+
+
+#########################################################################################
+#                                  USERS                                                #
+#########################################################################################
+
 
 
 @route('/usuario',method='POST')

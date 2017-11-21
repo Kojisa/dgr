@@ -51,7 +51,8 @@ tablas={
     'presupuestos':{
         'id':'INT',
         'cliente':'INT',
-        'aprobado':'BOOL'
+        'aprobado':'BOOL',
+        'activo':'BOOL'
     },
     'pagosPresupuestos':{
         'id':'INT',
@@ -67,7 +68,8 @@ tablas={
         'item':'INT',
         'fecha':'INT',
         'usuario':'INT',
-        'comentario':'VARCHAR(400)'
+        'comentario':'VARCHAR(400)',
+        'alCliente':'BOOL',
     },
     'requisitosItemPresupuesto':{
         'item':'INT',
@@ -89,7 +91,7 @@ tablas={
         'completo':'BOOL',
         'fechaCompletado':'datetime',
         'pago':'BOOL',
-        'estado':'VARCHAR(60)',
+        'estado':'INT',# cambiar 'VARCHAR(60)' => INT,
     },
     'estadosItems':{
         'item':'INT',
@@ -100,12 +102,13 @@ tablas={
     'items':{
         'id':'INT',
         'area':'INT',
-        'descripcion':'INT',
+        'descripcion':'VARCHAR(100)',
         'precio':'float(10,2)',
-        'requisitos':'VARCHAR(100)',#almaceno como string la lista de items requisitos
+        'requisitos':'VARCHAR(200)',#almaceno como string la lista de items requisitos
         'tipo':'INT',#esto es para determinar si es una variable que almacena dato, o tiene estados
         'defaultACargo':'INT',#no se si lo voy a usar, pero es por si quiero setear un valor por default de quien se hacer cargo
-        'estado':'INT'
+        'estado':'INT',#capaz se podria usar para plantear el estado por default
+        'habilitado':'BOOL',
     }
 }
 

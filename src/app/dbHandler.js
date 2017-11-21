@@ -9,26 +9,31 @@ export default class DBHandler{
 
     
 
+    pedir_item(fun,id){
+        this.enviarPeticion(fun,'item/'+str(id),'GET',null);
+    }
+    
+
     pedir_usuario(fun,us,pas){
         this.enviarPeticion(fun,'usuario','POST',{'usuario':us,'contra':pas},false,false);
     }
 
     pedir_posiciones_frente_al_iva(fun){
-        this.enviarPeticion(fun,'tiposIvas','GET',null,true,false);
+        this.enviarPeticion(fun,'tiposIvas','GET',null,true);
     }
 
 
     pedir_clientes(fun){
-        this.enviarPeticion(fun,'listadoClientes','GET',null,true,false);
+        this.enviarPeticion(fun,'listadoClientes','GET',null,true);
     }
 
     pedir_datos_cliente(fun,id){
-        this.enviarPeticion(fun,'devolverCliente','POST',id,true,false);
+        this.enviarPeticion(fun,'devolverCliente','POST',id,true);
         
     }
 
     guardar_datos_cliente(fun,datos){
-        this.enviarPeticion(fun,'guardarCliente','POST',datos,true,false);
+        this.enviarPeticion(fun,'guardarCliente','POST',datos,true);
     }
 
     
