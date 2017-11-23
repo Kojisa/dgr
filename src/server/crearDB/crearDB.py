@@ -110,7 +110,7 @@ tablas={
         'descripcion':'VARCHAR(100)',
         'precio':'float(10,2)',
         'requisitos':'VARCHAR(200)',#almaceno como string la lista de items requisitos
-        'tipo':'INT',#esto es para determinar si es una variable que almacena dato, o tiene estados
+        'tipo':'BOOL',#esto es para determinar si es una variable que almacena dato, o tiene estados
         'defaultACargo':'INT',#no se si lo voy a usar, pero es por si quiero setear un valor por default de quien se hacer cargo
         'estado':'INT',#capaz se podria usar para plantear el estado por default
         'habilitado':'BOOL',
@@ -166,6 +166,22 @@ def crearBaseDeDatos():
     
     con.commit()
 
+    cur.execute('insert into usuarios(usuario,contra) values("root","dgrroot")')
+    con.commit()
+    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Respo")
+    con.commit()
+    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Monotributista');")
+    con.commit()
+    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Exento');")
+    con.commit()
+    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('No alcanzado o No Responsable');")
+    con.commit()
+    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Consumidor final');")
+    con.commit()
+
+
+
+
 def borrarBase():
     con,cur = conectar()
     cur.execute("DROP DATABASE IF EXISTS {}".format(DBNAME))
@@ -178,7 +194,7 @@ def borrarBase():
 def conectar():
 
     try:
-        con = CON.connect(host=HOST,user=USER,password=PASS,port=PORT)
+        con = CON.connect(host=HOST,user=USER,password=PASS)#,port=PORT)
 
     except:
         print("No se pudo realizar la conexion con la base de datos")

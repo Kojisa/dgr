@@ -4,6 +4,7 @@ import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Avatar,List,ListItem,Paper,
         RaisedButton,SelectField,MenuItem,Divider} from 'material-ui';
 import DBHandler from '../dbHandler';
+import {Edicion} from './EditarItem';
 
 
 
@@ -25,16 +26,20 @@ class Contenedor extends Component{
     constructor(props){
         super(props);
         this.state = {
-            items:[{'descripcion':'Libre deuda','id':1}],
-            elegido:'',
+            items:[],
+            elegido:0,
             area:0,
-            areas:[{'descripcion':'Planeamiento','id':1},
-            {'descripcion':'Plano Municipal Obra Civil','id':2}],
+            areas:[],
 
         }
         this.db = new DBHandler();
         this.cambiarArea = this.cambiarArea.bind(this);
         this.cargarItems = this.cargarItems.bind(this);
+        this.cargarAreas = this.cargarAreas.bind(this);
+    }
+
+    componentDidMount(){
+        this.db.pedir_areas(this.cargarAreas)
     }
 
     cargarItems(datos){
@@ -44,11 +49,15 @@ class Contenedor extends Component{
         })
     }
 
+    cargarAreas(datos){
+        this.setState({areas:datos})
+    }
+
     cambiarArea(evento,index,valor){
         if(valor !== this.state.area){
             this.setState({
-                area:value
-            },this.db.pedir_items())
+                area:valor
+            },this.db.pedir_items(this.cargarItems,valor))
         }
     }
 
@@ -67,26 +76,51 @@ class Contenedor extends Component{
         if(items.length === 0){
             return <ListItem  primaryText='No hay Items para Tipo'></ListItem>
         }
-        return items.map((elem,index)=>(
-            <ListItem primaryText={elem.descripcion} 
-            onClick={()=>(this.setState({elegido:elem.id}))} 
-            ></ListItem>
-        ))
+        return items.map((elem,index)=>{
+            if(elem.area == this.state.area){
+                return <ListItem primaryText={elem.descripcion} 
+                onClick={()=>(this.setState({elegido:elem.id}))} 
+                ></ListItem>
+            }
+        })
     }
 
     render(){
+        let edicion = null;
+        
+        if(this.state.elegido != 0){
+            edicion= <div>
+                <Edicion id={this.state.elegido} area={this.state.area} 
+                items={this.state.items} funAct={()=>this.db.pedir_items(this.cargarItems,this.state.area)} />
+            </div>
+        }
+
+        let botonNuevo = null;
+        if(this.state.area != 0){
+            botonNuevo = <RaisedButton label='Nuevo'
+             onClick={()=>(this.setState({elegido:-1}))} ></RaisedButton>
+        }
+
+
+
         return(
-            <Paper>
-                <div style={{margin:'5px'}}>
-                    <SelectField value={this.state.area} floatingLabelText='Tipo de Presupuesto' onChange={this.cambiarArea} >
-                        {this.generarAreas()}
-                    </SelectField>
-                    <br/>
-                    <List>
-                        {this.generarItems()}
-                    </List>
+            <div>
+                <Paper style={{width:'450px',display:'inline-block'}} >
+                    <div style={{margin:'5px'}}>
+                        <SelectField value={this.state.area} floatingLabelText='Tipo de Presupuesto' onChange={this.cambiarArea} >
+                            {this.generarAreas()}
+                        </SelectField>
+                        {botonNuevo}
+                        <br/>
+                        <List>
+                            {this.generarItems()}
+                        </List>
+                    </div>
+                </Paper>
+                <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left',marginLeft:'5px'}}>
+                    {edicion}
                 </div>
-            </Paper>
+            </div>
         )
     }
 }

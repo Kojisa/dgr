@@ -50,6 +50,9 @@ def devolverPlanes():
 
 @route('/planes/agregar',method='POST')
 def agregarPlan():
+
+    #diccionarios => datos= {'cliente':idCliente,'alias':'aliasdelPlan','items':[{'id':idItem,'responsable':tipoResponsable}]}
+
     datos = request.json['datos']
 
     ordenPlan = 'insert into presupuestos(cliente,aprobado,activo,alias,fechaCreacion)\
@@ -58,19 +61,60 @@ def agregarPlan():
     datos['fechaCreacion'] = datetime.datetime.now()
 
     db.contestarQuery(ordenPlan,datos,False)
+    db.aceptarCambios()
 
     datos['id'] = db.ultimaId()
 
-    ordenObtenerRequisitosItems = 'select requisitos from items where id = %(id)s'
+    ordenObtenerDatosItem = 'select requisitos,precio,descripcion from items where id = %(id)s'
     ordenGenerarRequisitosPresup = 'insert into requisitosItemPresupuesto(item,requisito,completo)\
     values(%(id)s,%(requisito)s,false);'
 
+    ordenAgregarItem = 'insert into itemsPresupuesto(area,presupuesto,precio,responsable,\
+    estado,descripcion) values(%(area)s,%(presupuesto)s,%(precio)s,%(responsable)s,%(descripcion)s);'
     
 
     for item in datos['items']:
         
-        requisitos = db.contestarQuery(ordenObtenerRequisitosItems,item)
-        requisitos = requisitos.splice(';')
+        item['presupuesto'] = datos['id']
+
+        datos = db.contestarQuery(ordenObtenerDatosItems,item)
+        requisitos = datos['requisitos'].splice(';')
+
+        db.contestarQuery(ordenAgregarItem,datos,False)
+        db.aceptarCambios()
+        item['idPresu'] = db.ultimaId()
+
+        for requisito in requisitos:
+
+            db.contestarQuery(ordenGenerarRequisitosPresup,{'id':item['idPresu'],'requisito':requisito},False)
+            db.aceptarCambios()
+        
+    
+@route('/plan',method='POST')
+def devolverPlan():
+
+    datos = request.json['datos']
+
+    ordenPlan = 'Select aprobado,activo,alias,fechaCreacion,fechaFinaliza,fechaAprobacion\
+    from presupuestos where id=%(id)s'
+
+    plan = db.contestarQuery(ordenPlan,datos)
+
+    ordenItems = 'select id,descripcion,completo from itemsPresupuesto where presupuesto = %(id)s'
+
+    plan['items'] = db.contestarQuery(ordenItems,datos)
+
+    ordenComentarios = 'select comentario,fecha,alCliente from comentariosItems where item = %(id)s'
+
+    comentarios = {}
+
+    for item in plan['items']:
+        
+        comentarios[item['id']] = db.contestarQuery(ordenComentarios,item)
+
+    plan['comentarios'] = comentarios
+
+    return dumps(plan)
 
 
 
@@ -84,7 +128,7 @@ def devolverAreas():
 
     ordenAreas = 'select id,descripcion from areas;'
     areas =db.contestarQuery(ordenAreas)
-    return dumps({'areas':areas})
+    return dumps(areas)
 
 @route('/area/agregar',method='POST')
 def agregarArea():
@@ -95,6 +139,7 @@ def agregarArea():
     
     db.contestarQuery(orden,datos,False)
     db.aceptarCambios()
+    return dumps('Ok')
 
 @route('/area/editar',method='POST')
 def modificarArea():
@@ -104,6 +149,7 @@ def modificarArea():
     orden = 'update areas set descripcion = %(descripcion)s where id = %(id)s;'
     db.contestarQuery(orden,datos,False)
     db.aceptarCambios()
+    return dumps('Ok')
 
 
 #########################################################################################
@@ -113,7 +159,7 @@ def modificarArea():
 @route('/items',method='POST')
 def devolverItems():
     datos = request.json['datos']
-    ordenItems = 'select id,descripcion from items where area = %(area)s'
+    ordenItems = 'select id,descripcion,area from items where area = %(area)s'
     
     items = db.contestarQuery(ordenItems,datos)
     return dumps({'items':items })
@@ -124,24 +170,38 @@ def devolverItem():
     
     orden = 'select descripcion,precio,requisitos,tipo from items where id = %(id)s;'
 
-    ordenEstados = 'select id,descripcion,completarItem from estadosItems where item = %(id)s;'
+    ordenEstados = 'select id,descripcion,completaItem from estadosItems where item = %(id)s;'
 
-    item = db.contestarQuery(orden,datos)
+    item = db.contestarQuery(orden,datos)[0]
 
     item['estados'] = db.contestarQuery(ordenEstados,datos)
 
 
     return dumps(item)
 
+
+@route('/items/requisitos',method='POST')
+def devolverItemsRequisitos():
+    datos = request.json['datos']
+    
+
+
 @route('/item/agregar',method='POST')
 def agregarItem():
 
     datos = request.json['datos']
-
+    print(datos)
     orden = 'insert into items(area,descripcion,precio,requisitos,tipo) \
     values(%(area)s,%(descripcion)s,%(precio)s,%(requisitos)s,%(tipo)s); '
 
-    db.contestarQuery(orden,datos,False)
+    db.contestarQuery(orden,{
+        'area':datos['area'],
+        'descripcion':datos['descripcion'],
+        'precio':datos['precio'],
+        'requisitos':datos['requisitos'],
+        'tipo':datos['tipo']
+        }
+        ,False)
     db.aceptarCambios()
     idItem = db.ultimaId()
     
@@ -153,12 +213,14 @@ def agregarItem():
         db.contestarQuery(ordenEstados,estado,False)
         db.aceptarCambios()
     
-    return dumps({'id',idItem})
+    return dumps({'id':idItem})
 
 @route('/item/actualizar',method='POST')
 def actualizarItem():
 
     datos = request.json['datos']
+
+    print datos
 
     orden = 'update items set descripcion = %(descripcion)s, precio = %(precio)s, \
     requisitos = %(requisitos)s where id = %(id)s;'
@@ -167,9 +229,12 @@ def actualizarItem():
     values(%(descripcion)s,%(item)s,%(completaItem)s)'
 
     ordenActualizarEstado = 'update estadosItems set descripcion = %(descripcion)s, \
-    completarItem = %(completarItem)s where id = %(id)s '
+    completaItem = %(completaItem)s where id = %(id)s '
 
-    db.contestarQuery(orden,datos,False)
+    db.contestarQuery(orden,{'descripcion':datos['descripcion'],
+    'precio':datos['precio'],
+    'requisitos':datos['requisitos'],
+    'id':datos['id']},False)
     db.aceptarCambios()
 
 
@@ -340,4 +405,4 @@ class SSLWebServer(ServerAdapter):
 
 server_names['sslwebserver'] = SSLWebServer
 
-run(host="0.0.0.0",port=1400,server='sslwebserver')
+run(host="0.0.0.0",port=1400)

@@ -1,30 +1,52 @@
 export default class DBHandler{
     
     PORT = ':1400';
-    HOST = '138.219.40.2';
+    HOST = 'localhost';
 
 
     posicionesFrenteIva=['Responsable Inscripto','Monotributista','Exento',
         'No alcanzado o No Responsable','Consumidor final'];
 
-    
 
-    pedir_item(fun,id){
-        this.enviarPeticion(fun,'item/'+str(id),'GET',null);
+    pedir_areas(fun){
+        this.enviarPeticion(fun,'areas','GET',null,false,false)
+    }
+
+    agregar_item(fun,datos){
+        this.enviarPeticion(fun,'item/agregar','POST',datos,false,false)
+    }
+
+    actualizar_item(fun,datos){
+        this.enviarPeticion(fun,'item/actualizar','POST',datos,false,false)
     }
     
+    pedir_items(fun,area){
+        this.enviarPeticion(fun,'items','POST',{area:area},false,false);
+    }
+
+    pedir_item(fun,id){
+        this.enviarPeticion(fun,'item','POST',{'id':id},false,false);
+    }
+    
+    guardar_area(fun,datos){
+        this.enviarPeticion(fun,'area/agregar','POST',datos,false,false);
+    }
+
+    actualizar_area(fun,datos){
+        this.enviarPeticion(fun,'area/editar','POST',datos,false,false);
+    }
 
     pedir_usuario(fun,us,pas){
         this.enviarPeticion(fun,'usuario','POST',{'usuario':us,'contra':pas},false,false);
     }
 
     pedir_posiciones_frente_al_iva(fun){
-        this.enviarPeticion(fun,'tiposIvas','GET',null,true);
+        this.enviarPeticion(fun,'tiposIvas','GET',null,true,false);
     }
 
 
     pedir_clientes(fun){
-        this.enviarPeticion(fun,'listadoClientes','GET',null,true);
+        this.enviarPeticion(fun,'listadoClientes','GET',null,true,false);
     }
 
     pedir_datos_cliente(fun,id){
@@ -37,7 +59,7 @@ export default class DBHandler{
     }
 
     
-    enviarPeticion(fun,url,metodo,datos,asinc=true,auth=true){
+    enviarPeticion(fun,url,metodo,datos,asinc=true,auth=false){
             var request = new XMLHttpRequest();
             request.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){

@@ -4,13 +4,16 @@ import db from './dbHandler.js';
 import injectTapPlugin from 'react-tap-event-plugin';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material-ui';
-import edicionCliente from './clientes/edicionCliente.js';
 import listaClientes from './clientes/listaClientes.jsx';
+import gestionItems from './presupuesto/GestionItems'
+import gestionAreas from './presupuesto/GestionAreas'
 
 
 class Nav extends React.Component{
     lista = [ //futuro formato [nombre,icono,funcion]
     ];  
+    
+
 
     controlNav;
 
@@ -24,10 +27,17 @@ class Nav extends React.Component{
         this.cambiarEstado = this.cambiarEstado.bind(this);
     }
 
+
+
     crearLista(){
         let lista = [
             {nombre:'Clientes',
             funcion:()=>listaClientes()},
+            {nombre:'Edicion Items',
+            funcion:()=>gestionItems()},
+            {nombre:'Edicion Plantillas',
+            funcion:()=>gestionAreas()},
+            
         ];
         return lista;
 

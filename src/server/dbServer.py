@@ -38,7 +38,7 @@ class DBServer:
 def conectar():
 
     try:
-        con = CON.connect(host=HOST,user=USER,password=PASS,port=PORT)
+        con = CON.connect(host=HOST,user=USER,password=PASS)#,port=PORT)
     except:
         print("No se pudo realizar la conexion con la base de datos")
 
