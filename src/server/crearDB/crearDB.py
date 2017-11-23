@@ -53,7 +53,11 @@ tablas={
         'id':'INT',
         'cliente':'INT',
         'aprobado':'BOOL',
-        'activo':'BOOL'
+        'activo':'BOOL',
+        'alias':'VARCHAR(30)',
+        'fechaCreacion':'DATETIME',
+        'fechaFinaliza':'DATETIME',
+        'fechaAprobacion':'DATETIME',
     },
     'pagosPresupuestos':{
         'id':'INT',

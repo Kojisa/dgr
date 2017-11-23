@@ -38,9 +38,39 @@ def dummy():
 #                                  PLANES                                               #
 #########################################################################################
 
-@route('/planes',method='GET')
+@route('/planes',method='POST')
 def devolverPlanes():
+    datos = request.json['datos']
+
+    orden = 'Select id,tipo,fechaCreacion,alias \
+    from presupuestos where activo = true and cliente = %(cliente)s'
+
+    planes = db.contestarQuery(orden,datos)
+    return dumps({'planes':planes})
+
+@route('/planes/agregar',method='POST')
+def agregarPlan():
+    datos = request.json['datos']
+
+    ordenPlan = 'insert into presupuestos(cliente,aprobado,activo,alias,fechaCreacion)\
+    values(%(cliente)s,false,true,%(alias)s,%(fechaCreacion)s);'
+
+    datos['fechaCreacion'] = datetime.datetime.now()
+
+    db.contestarQuery(ordenPlan,datos,False)
+
+    datos['id'] = db.ultimaId()
+
+    ordenObtenerRequisitosItems = 'select requisitos from items where id = %(id)s'
+    ordenGenerarRequisitosPresup = 'insert into requisitosItemPresupuesto(item,requisito,completo)\
+    values(%(id)s,%(requisito)s,false);'
+
     
+
+    for item in datos['items']:
+        
+        requisitos = db.contestarQuery(ordenObtenerRequisitosItems,item)
+        requisitos = requisitos.splice(';')
 
 
 
