@@ -18,7 +18,7 @@ export default function main(){
     )
 }
 
-
+//4798
 export class CrearPlan extends Component{
 
     constructor(props){
@@ -29,7 +29,8 @@ export class CrearPlan extends Component{
             cliente:props.id,
             area:'',
             areas:[],
-            
+            elegidos:[],
+            items:[],
         }
     }
 }

@@ -183,6 +183,8 @@ def devolverItem():
 @route('/items/requisitos',method='POST')
 def devolverItemsRequisitos():
     datos = request.json['datos']
+
+    orden = 'select id,descripcion,requisitos from items where area = %(area)s'
     
 
 
