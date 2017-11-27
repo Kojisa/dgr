@@ -89,7 +89,8 @@ class Contenedor extends Component{
         let plan = null; 
         if(this.state.planActual === -1 && this.state.clienteActual !== 0 ){
             plan = <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
-                <RaisedButton onClick={()=>this.setState({planActual:0})} label='Volver al Listado' secondary={true}></RaisedButton>
+                <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px'}}
+                 label='Volver al Listado' secondary={true}></RaisedButton>
                 <EditarPlan cliente={this.state.clienteActual} ></EditarPlan>
             </div>
             muestra = null;

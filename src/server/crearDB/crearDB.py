@@ -87,8 +87,15 @@ tablas={
         'id':'INT',
         'descripcion':'VARCHAR(50)',
     },
+    'historialEstadosItems':{
+        'item':'INT',
+        'id':'INT',
+        'fecha':'DATETIME',
+        'texto':'VARCHAR(100)'
+    },
     'itemsPresupuesto':{
         'id':'INT',
+        'idItem':'INT',
         'area':'INT',
         'presupuesto':'INT',
         'descripcion':'VARCHAR(100)',
@@ -98,12 +105,15 @@ tablas={
         'completo':'BOOL',
         'fechaCompletado':'datetime',
         'pago':'BOOL',
+        'variable':'BOOL',
+        'valor':'VARCHAR(60)',
         'estado':'INT',# cambiar 'VARCHAR(60)' => INT,
+        'disponible':'BOOL'
     },
     'estadosItems':{
         'item':'INT',
         'id':'INT',
-        'descripcion':'VARCHAR(40)',
+        'descripcion':'VARCHAR(60)',
         'completaItem':'BOOL'
     },
     'items':{
@@ -112,7 +122,7 @@ tablas={
         'descripcion':'VARCHAR(100)',
         'precio':'float(10,2)',
         'requisitos':'VARCHAR(200)',#almaceno como string la lista de items requisitos
-        'tipo':'BOOL',#esto es para determinar si es una variable que almacena dato, o tiene estados
+        'variable':'BOOL',#esto es para determinar si es una variable que almacena dato, o tiene estados
         'defaultACargo':'INT',#no se si lo voy a usar, pero es por si quiero setear un valor por default de quien se hacer cargo
         'estado':'INT',#capaz se podria usar para plantear el estado por default
         'habilitado':'BOOL',

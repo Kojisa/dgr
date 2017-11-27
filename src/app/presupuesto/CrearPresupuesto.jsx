@@ -114,16 +114,33 @@ export class EditarPlan extends Component{
                 items[x]['aCargo'] = 1;
             }
             items[x]['orden'] = x;
+            items[x].requisitos = items[x].requisitos.split(';')
             lista.push(items[x])
         }
         this.setState({items:lista})
     }
 
-    seleccionar(evento,x){
-        console.log(evento);
-        let value = evento;//.target.value;
+    seleccionar(valor,x){
+        let value = valor;//.target.value;
         let items = this.state.items;
         items[x].elegido = value;
+        
+        if(valor === false){
+            for (let y = 0; y < items.length; y++){
+                if(items[y].requisitos.indexOf(items[x].id.toString()) !== -1 ){
+                    items[y].elegido = false;
+                }
+            }
+        }
+
+        if(valor === true){
+            for (let y = 0; y < items.length; y++){
+                if(items[x].requisitos.indexOf(items[y].id.toString()) !== -1){
+                    items[y].elegido = true;
+                }
+            }
+        }
+        
         this.setState({
             items:items
         })

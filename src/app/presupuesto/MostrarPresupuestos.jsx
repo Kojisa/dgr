@@ -93,10 +93,10 @@ export class Muestra extends Component{
             }
 
             if(agregar){
-                lista.push( <ListItem onClick={()=>this.actualizarPadre(planes[x].id,'planActual')}>
-                    <span style={{fontSize:'18px'}} >{planes[x].alias}</span>
-                    <br/>
-                    <span>Estado: {estado}</span>
+                lista.push( <ListItem onClick={()=>this.actualizarPadre(planes[x].id,'planActual')}
+                primaryText={planes[x].alias}
+                secondaryText={'Estado: ' + estado}
+                >
                 </ListItem> )
                 lista.push(<Divider></Divider>)
             }
@@ -128,7 +128,9 @@ export class Muestra extends Component{
                         {this.cargarEstados()}
                     </SelectField>
                     <br/>
-                    <RaisedButton primary={true} onClick={()=>this.actualizarPadre(-1,'planActual')} label='Nuevo' ></RaisedButton>
+                    <RaisedButton primary={true}
+                    onClick={()=>this.actualizarPadre(-1,'planActual')} 
+                    label='Nuevo' ></RaisedButton>
                     <br/>
                     <List>
                         {this.cargarPlanes()}

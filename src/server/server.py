@@ -74,8 +74,8 @@ def agregarPlan():
     ordenGenerarRequisitosPresup = 'insert into requisitosItemPresupuesto(item,requisito,completo)\
     values(%(id)s,%(requisito)s,false);'
 
-    ordenAgregarItem = 'insert into itemsPresupuesto(area,presupuesto,precio,responsable,\
-    descripcion,completo,pago) values(%(area)s,%(presupuesto)s,%(precio)s,%(responsable)s,\
+    ordenAgregarItem = 'insert into itemsPresupuesto(idItem,area,presupuesto,precio,responsable,\
+    descripcion,completo,pago) values(%(id)s,%(area)s,%(presupuesto)s,%(precio)s,%(responsable)s,\
     %(descripcion)s,%(completo)s,%(pago)s);'
     
 
@@ -109,19 +109,31 @@ def devolverPlan():
 
     plan = db.contestarQuery(ordenPlan,datos)
 
-    ordenItems = 'select id,descripcion,completo from itemsPresupuesto where presupuesto = %(id)s'
+    ordenItems = 'select id,idItem,descripcion,completo,disponible,estado,valor,variable from itemsPresupuesto where presupuesto = %(id)s'
 
     plan['items'] = db.contestarQuery(ordenItems,datos)
 
-    ordenComentarios = 'select comentario,fecha,alCliente from comentariosItems where item = %(id)s'
+    ordenComentarios = 'select comentario,fecha from comentariosItems where item = %(id)s and alCliente = true'
 
     comentarios = {}
+
+    ordenEstados = 'select item,descripcion from estadosItems where item = %(id)s'
+
+    estados = []
 
     for item in plan['items']:
         
         comentarios[item['id']] = db.contestarQuery(ordenComentarios,item)
 
+    for item in plan['items']:
+
+        estados = estados + db.contestarQuery(ordenEstados,item)
+
+    print estados
+
     plan['comentarios'] = comentarios
+
+    plan['estados'] = estados
 
     return dumps(plan)
 
@@ -218,7 +230,7 @@ def agregarItem():
 
     datos = request.json['datos']
     print (datos)
-    orden = 'insert into items(area,descripcion,precio,requisitos,tipo) \
+    orden = 'insert into items(area,descripcion,precio,requisitos,variable) \
     values(%(area)s,%(descripcion)s,%(precio)s,%(requisitos)s,%(tipo)s); '
 
     db.contestarQuery(orden,{
@@ -284,8 +296,6 @@ def anularItem():
 
     db.contestarQuery(orden,datos,False)
     db.aceptarCambios()
-
-
 
 
 #########################################################################################
