@@ -1,10 +1,11 @@
-import {EdicionCliente} from './edicionCliente';
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Avatar,List,ListItem,Paper,
         RaisedButton} from 'material-ui';
 import DBHandler from '../dbHandler';
+import {Muestra} from './MostrarPresupuestos';
+import {EditarPlan} from './CrearPresupuesto';
 
 
 
@@ -32,9 +33,11 @@ class Contenedor extends Component{
                 //'letra',
                 //'id'
                 //}
-            actual:'', //cliente a mostrar
+            clienteActual:0, //cliente a mostrar
             mostrarEdicion:false,
             filtro:'',
+            planActual:0,
+
         };
 
         this.db = new DBHandler();
@@ -46,8 +49,8 @@ class Contenedor extends Component{
 
     actualizarDatos(valor,campo){
         let dic = {[campo]:valor};
-        if(campo === 'actual'){
-            dic['mostrarEdicion'] = true;
+        if(campo === 'clienteActual'){
+            dic['planActual'] = 0;
         }
         this.setState(dic)
     }
@@ -57,7 +60,6 @@ class Contenedor extends Component{
     }
 
     cargarClientes(datos){
-
         this.setState({clientes:datos});
 
     }
@@ -77,9 +79,20 @@ class Contenedor extends Component{
 
 
     render(){
-        let edicion = <EdicionCliente actLista={this.pedirClientes} numeroCliente = {this.state.actual}></EdicionCliente>
-        if( this.state.mostrarEdicion === false){
-            edicion = null;
+        
+        let muestra = <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
+            <Muestra cliente={this.state.actual} funAct={this.actualizarDatos}/>
+        </div>
+        if(this.state.clienteActual === 0){
+            muestra = null;
+        }
+        let plan = null; 
+        if(this.state.planActual === -1 && this.state.clienteActual !== 0 ){
+            plan = <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
+                <RaisedButton onClick={()=>this.setState({planActual:0})} label='Volver al Listado' secondary={true}></RaisedButton>
+                <EditarPlan cliente={this.state.clienteActual} ></EditarPlan>
+            </div>
+            muestra = null;
         }
         return(
             <div>
@@ -88,7 +101,6 @@ class Contenedor extends Component{
                     <TextField floatingLabelText={ <label>Busqueda</label> } 
                     onChange={(evento)=>this.actualizarDatos(evento.target.value,evento.target.name)
                     } name='filtro' ></TextField>
-                    <RaisedButton label={'Nuevo'} primary={true} onClick={()=>(this.actualizarDatos('NUEVO','actual'))}/>
                     <br/>
                     </div>
                     <div style={{margin:'5px'}} >
@@ -97,9 +109,8 @@ class Contenedor extends Component{
                         </List>
                     </div>
                 </Paper>
-                <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
-                    {edicion}
-                </div>
+                {muestra}
+                {plan}
             </div>
         )
     }
@@ -130,7 +141,7 @@ class Cliente extends Component{
 
     render(){
         return(
-            <ListItem onClick={()=>this.actualizarPadre(this.state.id,'actual')} >
+            <ListItem onClick={()=>this.actualizarPadre(this.state.id,'clienteActual')} >
                 <Avatar>
                     {this.state.letra}
                 </Avatar>

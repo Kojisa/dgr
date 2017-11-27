@@ -89,10 +89,11 @@ class Contenedor extends Component{
 
         return(
             <div>
-                <Paper style={{width:'350px',display:'inline-block',marginLeft:'5px'}}>
+                <Paper style={{width:'400px',display:'inline-block',marginLeft:'5px'}}>
                     <div style={{margin:'5px'}}>
                         <TextField value={this.state.filtro} name='filtro' 
-                        onChange={this.actualizar} floatingLabelText='Buscar' ></TextField>
+                        onChange={this.actualizar} floatingLabelText='Buscar' 
+                        style={{width:'280px'}} ></TextField>
                         <RaisedButton label='Nuevo' primary={true}
                         onClick={()=>this.setState({elegido:-1,descElegido:''})} ></RaisedButton>
                         <br/>

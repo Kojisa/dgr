@@ -53,11 +53,13 @@ tablas={
         'id':'INT',
         'cliente':'INT',
         'aprobado':'BOOL',
+        'area':'INT',
         'activo':'BOOL',
         'alias':'VARCHAR(30)',
         'fechaCreacion':'DATETIME',
         'fechaFinaliza':'DATETIME',
         'fechaAprobacion':'DATETIME',
+        'cancelado':'BOOL',
     },
     'pagosPresupuestos':{
         'id':'INT',
@@ -166,9 +168,12 @@ def crearBaseDeDatos():
     
     con.commit()
 
+    #usuario
     cur.execute('insert into usuarios(usuario,contra) values("root","dgrroot")')
     con.commit()
-    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Respo")
+
+    #tipos de iva
+    cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Responsable');")
     con.commit()
     cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Monotributista');")
     con.commit()
@@ -178,6 +183,18 @@ def crearBaseDeDatos():
     con.commit()
     cur.execute("insert into gest_planes.tiposPosicionesIva(descripcion) value('Consumidor final');")
     con.commit()
+
+    #responsables
+    cur.execute("Insert into responsables(descripcion) values('DGR')")
+    con.commit()
+    cur.execute("Insert into responsables(descripcion) values('Cliente')")
+    con.commit()
+    cur.execute("Insert into responsables(descripcion) values('Organismo')")
+    con.commit()
+    cur.execute("Insert into responsables(descripcion) values('Tercerizado')")
+    con.commit()
+
+
 
 
 

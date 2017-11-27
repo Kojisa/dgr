@@ -73,7 +73,7 @@ export class Edicion extends Component{
                     <TextField value={this.state.descripcion} name='descripcion'
                     onChange={this.actualizar} floatingLabelText='Descripcion'></TextField>
                     <br/>
-                    <RaisedButton label='Actualizar' onClick={this.guardar} ></RaisedButton>
+                    <RaisedButton label='Guardar' onClick={this.guardar} ></RaisedButton>
                 </div>
 
             </Paper>

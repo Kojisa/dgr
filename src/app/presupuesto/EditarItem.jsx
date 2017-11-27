@@ -78,10 +78,11 @@ export class Edicion extends Component{
 
         let requisitos = [];
         for (let x = 0; x < this.state.requisitosFinales.length; x++){
-            if(this.state.requisitosFinales[x] === '' || this.state.requisitosFinales[x] === '\r'){
+            if(this.state.requisitosFinales[x] !== '' && this.state.requisitosFinales[x] !== '\r'){
                 requisitos.push(this.state.requisitosFinales[x])
             }
         }
+        console.log(requisitos)
         let estados = [];
         for (let x = 0; x < this.state.estados.length; x++){
             if(this.state.estados[x].descripcion !== '' || this.state.estados[x].id !== '' || this.state.estados[x].completaItem !== false){

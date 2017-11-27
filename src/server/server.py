@@ -40,52 +40,61 @@ def dummy():
 
 @route('/planes',method='POST')
 def devolverPlanes():
-    datos = request.json['datos']
+    cliente = request.json['datos']
 
-    orden = 'Select id,tipo,fechaCreacion,alias \
-    from presupuestos where activo = true and cliente = %(cliente)s'
+    orden = 'Select id,area,fechaCreacion,alias,activo,aprobado,cancelado \
+    from presupuestos where cliente = %(cliente)s;'
 
-    planes = db.contestarQuery(orden,datos)
-    return dumps({'planes':planes})
+    planes = db.contestarQuery(orden,{'cliente':cliente})
 
-@route('/planes/agregar',method='POST')
+    for plan in planes:
+        plan['fechaCreacion'] = plan['fechaCreacion'].isoformat()
+    return dumps(planes)
+
+@route('/plan/agregar',method='POST')
 def agregarPlan():
 
     #diccionarios => datos= {'cliente':idCliente,'alias':'aliasdelPlan','items':[{'id':idItem,'responsable':tipoResponsable}]}
 
-    datos = request.json['datos']
+    plan = request.json['datos']
 
-    ordenPlan = 'insert into presupuestos(cliente,aprobado,activo,alias,fechaCreacion)\
-    values(%(cliente)s,false,true,%(alias)s,%(fechaCreacion)s);'
+    ordenPlan = 'insert into presupuestos(cliente,aprobado,activo,alias,fechaCreacion,area)\
+    values(%(cliente)s,false,true,%(alias)s,%(fechaCreacion)s,%(area)s);'
 
-    datos['fechaCreacion'] = datetime.datetime.now()
+    plan['fechaCreacion'] = datetime.datetime.now()
 
-    db.contestarQuery(ordenPlan,datos,False)
+    db.contestarQuery(ordenPlan,{'cliente':plan['cliente'],
+    'alias':plan['alias'],'fechaCreacion':plan['fechaCreacion'],'area':plan['area'] },False)
+    
     db.aceptarCambios()
 
-    datos['id'] = db.ultimaId()
+    plan['id'] = db.ultimaId()
 
-    ordenObtenerDatosItem = 'select requisitos,precio,descripcion from items where id = %(id)s'
+    ordenObtenerDatosItem = 'select area,requisitos,descripcion from items where id = %(id)s'
     ordenGenerarRequisitosPresup = 'insert into requisitosItemPresupuesto(item,requisito,completo)\
     values(%(id)s,%(requisito)s,false);'
 
     ordenAgregarItem = 'insert into itemsPresupuesto(area,presupuesto,precio,responsable,\
-    estado,descripcion) values(%(area)s,%(presupuesto)s,%(precio)s,%(responsable)s,%(descripcion)s);'
+    descripcion,completo,pago) values(%(area)s,%(presupuesto)s,%(precio)s,%(responsable)s,\
+    %(descripcion)s,%(completo)s,%(pago)s);'
     
 
-    for item in datos['items']:
+    for item in plan['items']:
         
-        item['presupuesto'] = datos['id']
+        item['presupuesto'] = plan['id']
 
-        datos = db.contestarQuery(ordenObtenerDatosItems,item)
-        requisitos = datos['requisitos'].splice(';')
+        datos = db.contestarQuery(ordenObtenerDatosItem,item)[0]
+        requisitos = datos['requisitos'].split(';')
 
-        db.contestarQuery(ordenAgregarItem,datos,False)
+        db.contestarQuery(ordenAgregarItem,{'id':item['id'],'presupuesto':item['presupuesto'],
+        'area':plan['area'],'responsable':item['responsable'],'descripcion':item['descripcion'],
+        'precio':item['precio'],'completo':False,'pago':False } ,False)
         db.aceptarCambios()
         item['idPresu'] = db.ultimaId()
 
         for requisito in requisitos:
-
+            if(requisito == ''):
+                continue
             db.contestarQuery(ordenGenerarRequisitosPresup,{'id':item['idPresu'],'requisito':requisito},False)
             db.aceptarCambios()
         
@@ -151,6 +160,18 @@ def modificarArea():
     db.aceptarCambios()
     return dumps('Ok')
 
+#########################################################################################
+#                              RESPONSABLES                                             #
+#########################################################################################
+@route('/responsables',method='GET')
+def devolverResponsables():
+    
+    orden = 'select id,descripcion from responsables order by id;'
+
+    resp = db.contestarQuery(orden)
+    return dumps(resp)
+
+
 
 #########################################################################################
 #                                  ITEMS                                                #
@@ -184,7 +205,11 @@ def devolverItem():
 def devolverItemsRequisitos():
     datos = request.json['datos']
 
-    orden = 'select id,descripcion,requisitos from items where area = %(area)s'
+    orden = 'select id,descripcion,requisitos,precio from items where area = %(area)s'
+    
+    items = db.contestarQuery(orden,datos)
+
+    return dumps(items)
     
 
 
@@ -192,7 +217,7 @@ def devolverItemsRequisitos():
 def agregarItem():
 
     datos = request.json['datos']
-    print(datos)
+    print (datos)
     orden = 'insert into items(area,descripcion,precio,requisitos,tipo) \
     values(%(area)s,%(descripcion)s,%(precio)s,%(requisitos)s,%(tipo)s); '
 

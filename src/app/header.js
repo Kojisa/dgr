@@ -7,6 +7,9 @@ import {TextField,Paper,RaisedButton,AppBar,Drawer,List,ListItem} from 'material
 import listaClientes from './clientes/listaClientes.jsx';
 import gestionItems from './presupuesto/GestionItems'
 import gestionAreas from './presupuesto/GestionAreas'
+import editPlan from './presupuesto/CrearPresupuesto'
+import verPlanes from './presupuesto/MostrarPresupuestos'
+import presupuestos from './presupuesto/listaClientesPresup'
 
 
 class Nav extends React.Component{
@@ -37,6 +40,10 @@ class Nav extends React.Component{
             funcion:()=>gestionItems()},
             {nombre:'Edicion Plantillas',
             funcion:()=>gestionAreas()},
+            {nombre:'Crear Presup',
+            funcion:()=>editPlan()},
+            {nombre:'Presupuestos',
+            funcion:()=>presupuestos()},
             
         ];
         return lista;
@@ -101,7 +108,7 @@ class Login extends React.Component{
     }
 
     enviar_login(){
-        this.db.pedir_usuario(this.cargar_usuario,this.state.us,this.state.pas);
+        this.db.pedir_usuario(this.cargar_usuario,'root','dgrroot');
     }
     cargar_usuario(datos){
         if('error' in datos){

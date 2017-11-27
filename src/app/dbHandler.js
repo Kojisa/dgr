@@ -8,8 +8,9 @@ export default class DBHandler{
         'No alcanzado o No Responsable','Consumidor final'];
 
 
-    pedir_areas(fun){
-        this.enviarPeticion(fun,'areas','GET',null,false,false)
+
+    pedir_items_requisitos(fun,area){
+        this.enviarPeticion(fun,'items/requisitos','POST',{'area':area},false,false);
     }
 
     agregar_item(fun,datos){
@@ -27,13 +28,33 @@ export default class DBHandler{
     pedir_item(fun,id){
         this.enviarPeticion(fun,'item','POST',{'id':id},false,false);
     }
-    
+
+
+    pedir_responsables(fun){
+        this.enviarPeticion(fun,'responsables','GET',null,false,false);
+    }
+
+
+    guardar_plan(fun,datos){
+        this.enviarPeticion(fun,'plan/agregar','POST',datos,false,false);
+    }
+
+    pedir_planes(fun,datos){
+        this.enviarPeticion(fun,'planes','POST',datos,false,false);
+    }
+
+
     guardar_area(fun,datos){
         this.enviarPeticion(fun,'area/agregar','POST',datos,false,false);
     }
 
     actualizar_area(fun,datos){
         this.enviarPeticion(fun,'area/editar','POST',datos,false,false);
+    }
+
+
+    pedir_areas(fun){
+        this.enviarPeticion(fun,'areas','GET',null,false,false)
     }
 
     pedir_usuario(fun,us,pas){
