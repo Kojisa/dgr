@@ -225,11 +225,17 @@ def actualizarEstadoItem():
     ordenActualizar = 'update itemsPresupuesto set estado = %(idEst)s, completo = %(completaItem)s where id = %(id)s'
     
     ordenCompletarRequisito = 'update requisitosItempresupuesto set completo = true where requisito = %(id)s;'
-    if(estados[datos['estado'] - 1]['completaItem'] == 1):
+    
+    estadosDic = {}
+    for est in estados:
+        estadosDic[est['id']] = est
+
+
+    if(estadosDic[datos['estado']]['completaItem'] == 1):
         db.contestarQuery(ordenCompletarRequisito,datos,False)
         db.aceptarCambios()
 
-    db.contestarQuery(ordenActualizar,{'idEst':datos['estado'],'completaItem':estados[datos['estado'] - 1]['completaItem'],'id':datos['id']},False)
+    db.contestarQuery(ordenActualizar,{'idEst':datos['estado'],'completaItem':estadosDic[datos['estado']]['completaItem'],'id':datos['id']},False)
     db.aceptarCambios()
     return 
 
@@ -308,7 +314,7 @@ def devolverItems():
 def devolverItem():
     datos = request.json['datos']
     
-    orden = 'select descripcion,precio,requisitos,tipo from items where id = %(id)s;'
+    orden = 'select descripcion,precio,requisitos,variable from items where id = %(id)s;'
 
     ordenEstados = 'select id,descripcion,completaItem from estadosItems where item = %(id)s;'
 
@@ -345,7 +351,7 @@ def agregarItem():
         'descripcion':datos['descripcion'],
         'precio':datos['precio'],
         'requisitos':datos['requisitos'],
-        'tipo':datos['tipo']
+        'tipo':datos['variable']
         }
         ,False)
     db.aceptarCambios()

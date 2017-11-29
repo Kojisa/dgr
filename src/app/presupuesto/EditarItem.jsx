@@ -45,12 +45,12 @@ export class Edicion extends Component{
             refItems:refItems, //calve descripcion valor item id
             refDesc:refDesc, //clave item id valor descripcion
             id:id,
-            area:1,
+            area:props.area,
             descripcion:'',
-            precio:'',
+            precio:'0',
             requisitos:[''],
             requisitosFinales:[], //va a tener los numeros de ids
-            tipo:false,
+            variable:false,
             estados:[{descripcion:'',id:'',completaItem:false}],
 
         }
@@ -94,7 +94,7 @@ export class Edicion extends Component{
             descripcion : this.state.descripcion,
             area : this.state.area,
             precio : this.state.precio,
-            tipo : this.state.tipo,
+            variable : this.state.variable,
             requisitos : requisitos.join(';'),
             estados: estados,
             id :this.state.id,
@@ -141,10 +141,10 @@ export class Edicion extends Component{
                 id:-1,
                 area:props.area,
                 descripcion:'',
-                precio:'',
+                precio:'0',
                 requisitos:[''],
                 requisitosFinales:[''], //va a tener los numeros de ids
-                tipo:false,
+                variable:false,
                 estados:[{descripcion:'',id:'',completaItem:false}],
             })
         }
@@ -167,7 +167,7 @@ export class Edicion extends Component{
         let refItems = {};
         let refDesc = {};
         let precio = datos.precio;
-        let tipo = datos.tipo;
+        let tipo = datos.variable;
         let estados = datos.estados;
 
         
@@ -181,7 +181,7 @@ export class Edicion extends Component{
             requisitos:requisitos,
             requisitosFinales:requisitosFinales,
             precio:precio,
-            tipo:tipo,
+            variable:tipo,
             estados:estados,
             descripcion:datos.descripcion,
         })
@@ -265,7 +265,7 @@ export class Edicion extends Component{
 
     render(){
         let estados = null
-        if(this.state.tipo){
+        if(this.state.variable){
             estados = <Tab label='Estados'>
                          <Estados estados={this.state.estados} funAct={this.actualizarLista} funBor={this.borrarDeLista}/>
                     </Tab>;
@@ -425,6 +425,7 @@ class Requisito extends Component{
 class Estados extends Component{
     constructor(props){
         super(props);
+        console.log(props.estados)
         this.state={
             estados:props.estados
         }
@@ -434,6 +435,8 @@ class Estados extends Component{
     }
 
     componentWillReceiveProps(props){
+        
+        console.log(props.estados)
         this.setState({
             estados:props.estados
         })

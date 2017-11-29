@@ -36,12 +36,10 @@ class Nav extends React.Component{
         let lista = [
             {nombre:'Clientes',
             funcion:()=>listaClientes()},
-            {nombre:'Edicion Items',
-            funcion:()=>gestionItems()},
             {nombre:'Edicion Plantillas',
             funcion:()=>gestionAreas()},
-            {nombre:'Crear Presup',
-            funcion:()=>editPlan()},
+            {nombre:'Edicion Items',
+            funcion:()=>gestionItems()},
             {nombre:'Presupuestos',
             funcion:()=>presupuestos()},
             
@@ -108,7 +106,7 @@ class Login extends React.Component{
     }
 
     enviar_login(){
-        this.db.pedir_usuario(this.cargar_usuario,'root','dgrroot');
+        this.db.pedir_usuario(this.cargar_usuario,this.state.us,this.state.pas);
     }
     cargar_usuario(datos){
         if('error' in datos){
