@@ -6,6 +6,7 @@ import {TextField,Avatar,List,ListItem,Paper,
 import DBHandler from '../dbHandler';
 import {Muestra} from './MostrarPresupuestos';
 import {EditarPlan} from './CrearPresupuesto';
+import {Presupuesto} from './MuestraPresupuesto';
 
 
 
@@ -80,7 +81,7 @@ class Contenedor extends Component{
 
     render(){
         
-        let muestra = <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
+        let muestra = <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left',overflowY:'auto'}} >
             <Muestra cliente={this.state.actual} funAct={this.actualizarDatos}/>
         </div>
         if(this.state.clienteActual === 0){
@@ -88,13 +89,22 @@ class Contenedor extends Component{
         }
         let plan = null; 
         if(this.state.planActual === -1 && this.state.clienteActual !== 0 ){
-            plan = <div style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
-                <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px'}}
+            plan = <div style={{width:'600px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
+                <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px',width:'600px'}}
                  label='Volver al Listado' secondary={true}></RaisedButton>
                 <EditarPlan cliente={this.state.clienteActual} ></EditarPlan>
             </div>
             muestra = null;
         }
+        else if(this.state.planActual !== 0 && this.state.clienteActual !== 0){
+            plan = <div  style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}}>
+                <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px'}}
+                label='Volver al listado' secondary={true} />
+                <Presupuesto plan={this.state.planActual} />
+            </div>
+            muestra = null;
+        }
+        
         return(
             <div>
                 <Paper style={{width:'400px',display:'inline-block',margin:'5px'}} >

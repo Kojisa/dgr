@@ -8,57 +8,80 @@ export default class DBHandler{
         'No alcanzado o No Responsable','Consumidor final'];
 
 
+    guardar_comentario(fun,datos){
+        this.enviarPeticion(fun,'plan/item/guardarComentario','POST',datos,true,false);
+    }
+
+    actualizar_item_plan_valor(fun,datos){
+        this.enviarPeticion(fun,'plan/item/actualizarValor','POST',datos,true,false);
+    }
+
+    actualizar_item_plan_estado(fun,datos){
+        this.enviarPeticion(fun,'plan/item/actualizarEstado','POST',datos,true,false);
+    }
+    
+    actualizar_item_plan_responsable(fun,datos){
+        this.enviarPeticion(fun,'plan/item/actualizarResponsable','POST',datos,true,false);
+    }
+
+    aprobar_plan(fun,id){
+        this.enviarPeticion(fun,'plan/aprobar','POST',{'id':id},true,false);
+    }
+
+    pedir_items_presupuesto(fun,id){
+        this.enviarPeticion(fun,'plan','POST',{'id':id},true,false);
+    }
 
     pedir_items_requisitos(fun,area){
-        this.enviarPeticion(fun,'items/requisitos','POST',{'area':area},false,false);
+        this.enviarPeticion(fun,'items/requisitos','POST',{'area':area},true,false);
     }
 
     agregar_item(fun,datos){
-        this.enviarPeticion(fun,'item/agregar','POST',datos,false,false)
+        this.enviarPeticion(fun,'item/agregar','POST',datos,true,false)
     }
 
     actualizar_item(fun,datos){
-        this.enviarPeticion(fun,'item/actualizar','POST',datos,false,false)
+        this.enviarPeticion(fun,'item/actualizar','POST',datos,true,false)
     }
     
     pedir_items(fun,area){
-        this.enviarPeticion(fun,'items','POST',{area:area},false,false);
+        this.enviarPeticion(fun,'items','POST',{area:area},true,false);
     }
 
     pedir_item(fun,id){
-        this.enviarPeticion(fun,'item','POST',{'id':id},false,false);
+        this.enviarPeticion(fun,'item','POST',{'id':id},true,false);
     }
 
 
     pedir_responsables(fun){
-        this.enviarPeticion(fun,'responsables','GET',null,false,false);
+        this.enviarPeticion(fun,'responsables','GET',null,true,false);
     }
 
 
     guardar_plan(fun,datos){
-        this.enviarPeticion(fun,'plan/agregar','POST',datos,false,false);
+        this.enviarPeticion(fun,'plan/agregar','POST',datos,true,false);
     }
 
     pedir_planes(fun,datos){
-        this.enviarPeticion(fun,'planes','POST',datos,false,false);
+        this.enviarPeticion(fun,'planes','POST',datos,true,false);
     }
 
 
     guardar_area(fun,datos){
-        this.enviarPeticion(fun,'area/agregar','POST',datos,false,false);
+        this.enviarPeticion(fun,'area/agregar','POST',datos,true,false);
     }
 
     actualizar_area(fun,datos){
-        this.enviarPeticion(fun,'area/editar','POST',datos,false,false);
+        this.enviarPeticion(fun,'area/editar','POST',datos,true,false);
     }
 
 
     pedir_areas(fun){
-        this.enviarPeticion(fun,'areas','GET',null,false,false)
+        this.enviarPeticion(fun,'areas','GET',null,true,false)
     }
 
     pedir_usuario(fun,us,pas){
-        this.enviarPeticion(fun,'usuario','POST',{'usuario':us,'contra':pas},false,false);
+        this.enviarPeticion(fun,'usuario','POST',{'usuario':us,'contra':pas},true,false);
     }
 
     pedir_posiciones_frente_al_iva(fun){

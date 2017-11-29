@@ -73,7 +73,7 @@ tablas={
     'comentariosItems':{
         'id':'INT',
         'item':'INT',
-        'fecha':'INT',
+        'fecha':'DATETIME',
         'usuario':'INT',
         'comentario':'VARCHAR(400)',
         'alCliente':'BOOL',

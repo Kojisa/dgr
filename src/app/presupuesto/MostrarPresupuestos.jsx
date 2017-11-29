@@ -2,7 +2,7 @@ import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Avatar,List,ListItem,Paper,
-        RaisedButton,Divider,SelectField} from 'material-ui';
+        RaisedButton,Divider,SelectField,MenuItem} from 'material-ui';
 import DBHandler from '../dbHandler';
 
 
@@ -110,19 +110,20 @@ export class Muestra extends Component{
         let estados = ['Todos','Sin Aprobar','Vigentes','Cancelados','Completos'];
 
         for( let x = 0; x < estados.length; x++){
-            lista.push( <ListItem value={x} primaryText={estados[x]} onClick={()=>this.setState({
+            lista.push( <MenuItem value={x} primaryText={estados[x]} onClick={()=>this.setState({
                 estado:x
-            })}></ListItem> )
+            })}></MenuItem> )
         }
 
         return lista
 
     }
 
+    
     render(){
-
+        let altura = window.innerHeight -100;
         return(
-            <Paper style={{width:'300px'}} >
+            <Paper style={{width:'300px',maxHeight:altura,overflowY:'auto'}} >
                 <div style={{margin:'5px'}} >
                     <SelectField value={this.state.estado} style={{width:'220px'}} >
                         {this.cargarEstados()}

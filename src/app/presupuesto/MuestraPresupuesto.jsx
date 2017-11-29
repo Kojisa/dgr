@@ -2,7 +2,8 @@ import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import MUICont from 'material-ui/styles/MuiThemeProvider';
 import {TextField,Avatar,List,ListItem,Paper,
-        RaisedButton,Tab,Tabs,SelectField} from 'material-ui';
+        RaisedButton,Tab,Tabs,SelectField,MenuItem,
+    Checkbox} from 'material-ui';
 import DBHandler from '../dbHandler';
 
 export default function main(){
@@ -11,7 +12,7 @@ export default function main(){
 
     ReactDOM.render(
         <MUICont>
-            <Muestra/>
+            <Presupuesto/>
         </MUICont>,
         root
     )
@@ -20,7 +21,7 @@ export default function main(){
 
 
 
-export class Muestra extends Component{
+export class Presupuesto extends Component{
 
     constructor(props){
         super(props);
@@ -33,14 +34,29 @@ export class Muestra extends Component{
         this.state={
             alias:'',
             items:[],
-            elegido:0,
+            elegido:-1,
             estados:{},
-            plan:0,
+            plan:plan,
+            aprobado:false,
+            activo:false,
+            cancelado:false,
+            fechaCreacion:'',
+            fechaFinaliza:'',
+            fechaAprobacion:'',
+            requisitos:{},
+            historial:{},
             
         }
 
         this.db = new DBHandler();
         this.recibirItems = this.recibirItems.bind(this);
+        this.aprobarPlan = this.aprobarPlan.bind(this);
+    }
+
+    componentDidMount(){
+        if(this.state.plan !== 0){
+            this.db.pedir_items_presupuesto(this.recibirItems,this.state.plan);
+        }
     }
 
     componentWillReceiveProps(props){
@@ -54,6 +70,7 @@ export class Muestra extends Component{
     }
 
     recibirItems(datos){
+        console.log(datos)
         let items = datos.items;
         let estados = {};
         let estadosRaw = datos.estados;
@@ -64,8 +81,25 @@ export class Muestra extends Component{
             estados[estadosRaw[x].item][estadosRaw[x].id] = estadosRaw[x].descripcion;
 
         }
-        this.setState({estados:estados,items:items})
+        this.setState({estados:estados,
+            items:items,
+            comentarios:datos.comentarios,
+            requisitos:datos.requisitos,
+            historia:datos.historial,
+            aprobado:datos.aprobado,
+            activo:datos.activo,
+            alias:datos.alias,
+            fechaCreacion:datos.fechaCreacion,
+            fechaFinaliza:datos.fechaFinaliza,
+            fechaAprobacion:datos.fechaAprobacion,
+            cancelado:datos.cancelado,
+            estados:datos.estados,
+        })
 
+    }
+
+    aprobarPlan(){
+        this.db.aprobar_plan(()=>this.db.pedir_items_presupuesto(this.recibirItems,this.state.plan),this.state.plan)
     }
 
     cargarItems(){
@@ -76,29 +110,112 @@ export class Muestra extends Component{
         }
         let lista = [];
         for( let x = 0; x < items.length; x++){
+            let habilitado = true;
+            if(items[x].id in this.state.requisitos){
+                console.log('entra')
+                let req = this.state.requisitos[items[x].id];
+                for (let x = 0; x< req.length; x++){
+                    console.log(req[x])
+                    if(req[x].completo === 0){
+                        habilitado = false;
+                        break;
+                    }
+                }
+            }
+            if(habilitado === false){
+                continue;
+            }
             let segundoTexto = '';
             if(items[x].variable === 1){
-                segundoTexto = items[x].valor;
+                if(items[x].valor){
+                    segundoTexto = 'Valor:' + items[x].valor;
+                }
+                segundoTexto= 'Sin valor';
+
             }
             else if(items[x].variable === 0){
-                segundoTexto = this.state.estados[items[x].idItem][items[x].estado]
+                if(items[x].estado){
+                    segundoTexto = this.state.estados[items[x].idItem][items[x].estado]
+                }
+                else{
+                    segundoTexto = 'Sin estado';
+                }
             }
             lista.push(
                 <ListItem primaryText={items[x].descripcion}
                 secondaryText={segundoTexto}
-                onClick={()=>this.setState({elegido:items[x].id})} >
+                onClick={()=>this.setState({elegido:x})} >
                 </ListItem>
             )
         }
+        return lista
     }
 
     render(){
 
-        return( <Paper>
-            <div style={{margin:'5px'}} >
-                <List>
+        let items = null;
+        if(this.state.aprobado){
+
+            items=<List>
                     {this.cargarItems()}
                 </List>
+
+        }
+        else if(this.state.activo){
+            items = <RaisedButton label='Aprobar' primary={true} onClick={this.aprobarPlan} />
+        }
+        let estado = '';
+        if(this.state.cancelado ){
+            estado = 'Cancelado';
+        }
+        else if (!this.state.aprobado){
+            estado = 'Esperando Aprobacion';
+        }
+        else if(this.state.aprobado && this.state.activo){
+            estado = 'En proceso';
+        }
+        else if(this.state.aprobado && !this.state.activo){
+            estado = 'Finalizado';
+        }
+
+        let item = null;
+        if(this.state.elegido != -1){
+            let estados = []
+            let id = this.state.items[this.state.elegido].id
+            console.log(this.state.estados)
+            if(id in this.state.estados){
+                estados = this.state.estados[id]
+            }
+            let requisitos = [];
+            if(id in this.state.requisitos){
+                requisitos = this.state.requisitos[id]
+            }
+
+            item= <EstadoItem 
+            comentarios={this.state.comentarios[id]}
+            estados={estados}
+            variable={this.state.items[this.state.elegido].variable}
+            id={id}
+            responsable={this.state.items[this.state.elegido].responsable}
+            completo={this.state.items[this.state.elegido].completo}
+            requisitos={requisitos}
+            precio={this.state.items[this.state.elegido].precio}
+            estado={this.state.items[this.state.elegido].estado} 
+            valor={this.state.items[this.state.elegido].valor}/>
+        }
+
+        return( <Paper>
+            <div style={{margin:'5px',display:'inline-block'}} >
+                <span>{this.state.alias}</span>
+                <br/>
+                <span>Fecha de Cracion: {this.state.fechaCreacion}</span>
+                <br/>
+                <span>Estado: {estado}</span>
+                <br/>
+                {items}
+            </div>
+            <div>
+                {item}
             </div>
         </Paper> )
     }
@@ -117,34 +234,41 @@ class EstadoItem extends Component{
         }
 
         this.state = {
-            comentarios:[],
-            estados:[],
-            variable:false,
+            comentarios:props.comentarios,
+            estados:props.estados,
+            variable:props.variable,
             id:id,
-            responsable:0,
-            responsables:[],
-            completo:false,
-            requisitos:[],//requisitos y su estado.
+            responsable:props.responsable,
+            responsables:[
+                <MenuItem value={1} primaryText='DGR'/>,
+                <MenuItem value={2} primaryText='Cliente'/>,
+                <MenuItem value={3} primaryText='Organismo'/>,
+                <MenuItem value={4} primaryText='Tercerizado'/>
+            ],
+            completo:props.completo,
+            requisitos:props.requisitos,//requisitos y su estado.
+            precio:props.precio,
+            estado:props.estado,
+            valor:props.valor,
         }
         this.db = new DBHandler();
-        this.recibirItem = this.recibirItem.bind(this);
+        
     }
-
-    recibirItem(datos){
-
-    }
-
 
     componentWillReceiveProps(props){
-        if(!props.id || this.state.id === props.id){
-            return;
-        }
-
         this.setState({
-            id:props.id
-        })
-        this.db.pedir_estado_item(this.recibirItem,props.id);
+            valor:props.valor,
+            estado:props.estado,
+            comentarios:props.comentarios,
+            estados:props.estados,
+            variable:props.variable,
+            id:props.id,
+            responsable:props.responsable,
+            completo:props.completo,
+            requisitos:props.requisitos,
+            precio:props.precio})
     }
+
 
     render(){
 
@@ -163,10 +287,11 @@ class EstadoItem extends Component{
                                         estados={this.state.estados}
                                         valor={this.state.valor}
                                         precio={this.state.precio}
-                                        disponible={this.state.disponible}  />
+                                        disponible={this.state.disponible}
+                                        plan={this.state.id}  />
                         </Tab>
                         <Tab label='Comentarios'>
-                            
+                            <Comentarios comentarios={this.state.comentarios} plan={this.state.id} />
                         </Tab>
                         <Tab label='Otros' >
 
@@ -185,14 +310,27 @@ class Comentarios extends Component{
         super(props);
         this.state ={
             comentarios:props.comentarios,
+            plan:props.plan,
+            comentario:'',
+            fecha:'',
+            alCliente:false,
 
         }
+        this.db = new DBHandler();
     }
 
     componentWillReceiveProps(props){
-        this.setState({
-            comentarios:props.comentarios
-        });
+        let dic = {
+            comentarios:props.comentarios,
+            plan:props.plan,
+            
+        }
+        if(props.plan != this.state.plan){
+            dic.comentario = '';
+            dic.fecha = '';
+            dic.alCliente = false;
+        }
+        this.setState(dic);
     }
 
     cargarComentarios(){
@@ -212,6 +350,32 @@ class Comentarios extends Component{
 
         return(
             <div style={{margin:'5px'}} >
+                <div>
+                    <TextField floatingLabelText='Fecha' type='date' floatingLabelFixed={true}
+                    onChange={(ev)=>this.setState({fecha:ev.target.value})}  />
+                    <br/>
+                    <TextField
+                        floatingLabelText="Comentario"
+                        multiLine={true}
+                        maxLegnth={100}
+                        style={{height:'100px'}}
+                        onChange={(ev)=>this.setState({comentario:ev.target.value})} />
+                    <br/>
+                    <Checkbox
+                        checked={this.state.alCliente}
+                        labelPosition='left'
+                        label="Al cliente"
+                        onCheck={(e, checked) => this.setState({alCliente:checked})}/>
+                    <RaisedButton
+                        primary={true}
+                        label="Enviar"
+                        onClick={()=>this.db.guardar_comentario(null,{
+                            id:this.state.plan,
+                            comentario:this.state.comentario,
+                            alCliente:this.state.alCliente,
+                            fecha:this.state.fecha,
+                        })} />
+                </div>
                 <div>
                     <List>
                         {this.cargarComentarios()}
@@ -286,7 +450,10 @@ class DatosItem extends Component{
             valor:props.valor,
             precio:props.precio,
             disponible:props.disponible,
+            plan:props.plan,
         }
+        this.actualizarValor = this.actualizarValor.bind(this);
+        this.db = new DBHandler();
     }
 
     componentWillReceiveProps(props){
@@ -303,34 +470,53 @@ class DatosItem extends Component{
             valor:props.valor,
             precio:props.precio,
             disponible:props.disponible,
+            plan:props.plan
         })
+    }
+
+    actualizarValor(){
+        if(this.state.variable === 0){
+            this.db.actualizar_item_plan_valor(null,{id:this.state.plan,valor:this.state.valor});
+        }
+        else{
+            this.db.actualizar_item_plan_estado(null,{id:this.state.plan,estado:this.state.estado});
+        }
+    }
+
+    actualizarResponsable(){
+        this.db.actualizarResponsable(null,{id:this.state.plan,estado:this.state.responsable});
     }
 
     render(){
 
         let valor = null;
-        if(this.state.variable === 1){    
-            valor = <TextField floatingLabelText='Valor'
-             value={this.state.valor} disabled={this.state.completo}></TextField>
+        let completo = false;
+        if(this.state.completo === 1){
+            completo = true;
+        }
+        if(this.state.variable === 0){    
+            valor = <TextField floatingLabelText='Variable' onChange={(ev)=>this.setState({valor:ev.target.value})}
+             value={this.state.valor} disabled={completo} ></TextField>
         }
         else{
-            valor = <SelectField value={this.state.estado} disabled={this.state.completo}>
-                {this.state.estados}
+            console.log(this.state.estado)
+            let estados = this.state.estados.map((elem,index)=><MenuItem value={elem.id} primaryText={elem.descripcion} key = {index}/>)
+            valor = <SelectField value={this.state.estado} disabled={completo} onChange={(elem,i,v)=>this.setState({estado:v})}>
+                {estados}
             </SelectField>
         }
-
 
         return(
             <div style={{margin:'5px'}} >
                 <label htmlFor="">{this.state.descripcion}</label>
                 <br/>
                 {valor}
-                <RaisedButton label='Actualizar' disabled={this.state.completo}/>
+                <RaisedButton label='Actualizar' disabled={completo} onClick={this.actualizarValor}/>
                 <br/>
-                <SelectField value={this.state.responsable} disabled={this.state.completo} >
+                <SelectField value={this.state.responsable} disabled={completo} onChange={(elem,i,v)=>this.setState({responsable:v})}>
                     {this.state.responsables}
                 </SelectField>
-                <RaisedButton label='Actualizar' disabled={this.state.completo} />
+                <RaisedButton label='Actualizar' disabled={completo} />
                 <br/>
                 Valor: <label htmlFor="">{this.state.precio}</label>
             </div>

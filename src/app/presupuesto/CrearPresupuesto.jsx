@@ -221,7 +221,7 @@ export class EditarPlan extends Component{
                     </SelectField>
                     <br/>
                     <Table selectable = {false} >
-                        <TableHeader displaySelectAll={false}>
+                        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow>
                                 <TableHeaderColumn>
                                     Seleccionar
