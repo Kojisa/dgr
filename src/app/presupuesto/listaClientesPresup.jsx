@@ -92,15 +92,15 @@ class Contenedor extends Component{
             plan = <div style={{width:'600px',display:'inline-block',verticalAlign:'top',gravity:'left'}} >
                 <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px',width:'600px'}}
                  label='Volver al Listado' secondary={true}></RaisedButton>
-                <EditarPlan cliente={this.state.clienteActual} ></EditarPlan>
+                <EditarPlan cliente={this.state.clienteActual} funAct ={()=>this.setState({planActual:0})} ></EditarPlan>
             </div>
             muestra = null;
         }
         else if(this.state.planActual !== 0 && this.state.clienteActual !== 0){
-            plan = <div  style={{width:'400px',display:'inline-block',verticalAlign:'top',gravity:'left'}}>
-                <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px'}}
+            plan = <div  style={{display:'inline-block',verticalAlign:'top',gravity:'left'}}>
+                <RaisedButton onClick={()=>this.setState({planActual:0})} style={{margin:'5px',width:'300px'}}
                 label='Volver al listado' secondary={true} />
-                <Presupuesto plan={this.state.planActual} />
+                <Presupuesto plan={this.state.planActual}  />
             </div>
             muestra = null;
         }

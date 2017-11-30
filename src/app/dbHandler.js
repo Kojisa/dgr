@@ -1,7 +1,7 @@
 export default class DBHandler{
     
     PORT = ':1400';
-    HOST = 'localhost';
+    HOST = '138.219.40.2';
 
 
     posicionesFrenteIva=['Responsable Inscripto','Monotributista','Exento',
@@ -11,6 +11,7 @@ export default class DBHandler{
     guardar_comentario(fun,datos){
         this.enviarPeticion(fun,'plan/item/guardarComentario','POST',datos,true,false);
     }
+
 
     actualizar_item_plan_valor(fun,datos){
         this.enviarPeticion(fun,'plan/item/actualizarValor','POST',datos,true,false);

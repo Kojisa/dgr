@@ -44,6 +44,7 @@ export class EditarPlan extends Component{
         this.recibirResponsables = this.recibirResponsables.bind(this);
         this.actualizarArea =this.actualizarArea.bind(this);
         this.guardarPresupuesto = this.guardarPresupuesto.bind(this);
+        this.actualizarInterfaz = props.funAct;
     }
 
 
@@ -81,7 +82,7 @@ export class EditarPlan extends Component{
             area:area,
         }
 
-        this.db.guardar_plan(null,dic);
+        this.db.guardar_plan(this.actualizarInterfaz,dic);
     }
 
 

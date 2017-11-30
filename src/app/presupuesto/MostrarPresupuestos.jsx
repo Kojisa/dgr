@@ -123,9 +123,10 @@ export class Muestra extends Component{
     render(){
         let altura = window.innerHeight -100;
         return(
-            <Paper style={{width:'300px',maxHeight:altura,overflowY:'auto'}} >
+            <Paper style={{width:'300px',maxHeight:altura,display:'inline-block',overflowY:'auto'}} >
                 <div style={{margin:'5px'}} >
-                    <SelectField value={this.state.estado} style={{width:'220px'}} >
+                    <SelectField value={this.state.estado} style={{width:'220px'}}
+                    floatingLabelText='Filtro por Estado' >
                         {this.cargarEstados()}
                     </SelectField>
                     <br/>

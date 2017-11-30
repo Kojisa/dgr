@@ -73,6 +73,9 @@ class Contenedor extends Component{
 
     generarItems(){
         let items = this.state.items;
+        if(this.state.area === 0){
+            return <ListItem  primaryText='No se eligio la plantilla'></ListItem>
+        }
         if(items.length === 0){
             return <ListItem  primaryText='No hay Items para Tipo'></ListItem>
         }
@@ -105,7 +108,7 @@ class Contenedor extends Component{
 
         return(
             <div>
-                <Paper style={{width:'450px',display:'inline-block'}} >
+                <Paper style={{width:'450px',display:'inline-block',heigth:'100vh',overflowY:'auto'}} >
                     <div style={{margin:'5px'}}>
                         <SelectField value={this.state.area} floatingLabelText='Tipo de Presupuesto' onChange={this.cambiarArea} >
                             {this.generarAreas()}

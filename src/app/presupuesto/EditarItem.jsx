@@ -273,9 +273,9 @@ export class Edicion extends Component{
         let tipo = null
         //si tiene id esta guardado, en dicho caso no se puede modificar
         if(this.state.id == -1){
-            tipo = <Checkbox checked={this.state.tipo} label='Posee estados'
+            tipo = <Checkbox checked={this.state.variable} label='Posee estados'
             labelPosition='left'
-            onCheck={()=>this.actualizar({target:{name:'tipo',value:!this.state.tipo}})} ></Checkbox>
+            onCheck={()=>this.actualizar({target:{name:'variable',value:!this.state.tipo}})} ></Checkbox>
         }
 
         let requi = null;

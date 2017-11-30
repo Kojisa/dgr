@@ -38,6 +38,81 @@ def dummy():
 #                                  PLANES                                               #
 #########################################################################################
 
+
+def devolverPlan(id):
+    datos = {'id':id}
+
+    ordenPlan = 'Select aprobado,activo,cancelado,alias,fechaCreacion,fechaFinaliza,fechaAprobacion\
+    from presupuestos where id=%(id)s'
+
+    plan = db.contestarQuery(ordenPlan,datos)[0]
+
+    if(plan['fechaCreacion']):
+        plan['fechaCreacion'] = plan['fechaCreacion'].isoformat()
+
+    if(plan['fechaFinaliza']):
+        plan['fechaFinaliza'] = plan['fechaFinaliza'].isoformat()
+    
+    if(plan['fechaAprobacion']):
+        plan['fechaAprobacion'] = plan['fechaAprobacion'].isoformat()
+
+
+    ordenItems = 'select i.id,i.idItem,i.descripcion,i.completo,i.disponible,i.estado,i.valor,i.variable,i.responsable,i.precio\
+    from itemsPresupuesto i where presupuesto = %(id)s'
+
+    plan['items'] = db.contestarQuery(ordenItems,datos)
+
+    ordenComentarios = 'select comentario,fecha,alCliente from comentariosItems where item = %(id)s order by fecha DESC'
+
+    comentarios = {}
+
+    ordenEstados = 'select id,item,descripcion from estadosItems where item = %(id)s'
+
+    estados = {}
+
+    ordenRequisitos = 'select r.item,i.descripcion,r.completo from requisitosItemPresupuesto r inner join\
+    itemsPresupuesto i on i.id = r.requisito where item = %(id)s'
+
+    requisitos = {}
+    
+    ordenHistorialItems = 'select item,fecha,texto from historialEstadosItems where item = %(id)s order by fecha ASC'
+
+    historialItems = {}
+
+    for item in plan['items']:
+        
+        comentarios[item['id']] = db.contestarQuery(ordenComentarios,{'id':item['id']})
+        for comen in comentarios[item['id']]:
+            comen['fecha'] = comen['fecha'].isoformat()
+
+    for item in plan['items']:
+
+        estados[item['id']] = db.contestarQuery(ordenEstados,{'id':item['idItem']})
+
+    for item in plan['items']:
+        
+        requisitos[item['id']] = db.contestarQuery(ordenRequisitos,{'id':item['id']})
+
+    for item in plan['items']:
+        historialItems[item['id']] = db.contestarQuery(ordenHistorialItems,{'id':item['id']})
+
+    print estados
+
+    plan['comentarios'] = comentarios
+
+    plan['estados'] = estados
+
+    plan['historial'] = historialItems
+
+    plan['requisitos'] = requisitos
+
+    return dumps(plan)
+
+
+
+
+
+
 @route('/planes',method='POST')
 def devolverPlanes():
     cliente = request.json['datos']
@@ -115,75 +190,12 @@ def agregarPlan():
         
     
 @route('/plan',method='POST')
-def devolverPlan():
+def devolver():
 
     datos = request.json['datos']
 
-    ordenPlan = 'Select aprobado,activo,cancelado,alias,fechaCreacion,fechaFinaliza,fechaAprobacion\
-    from presupuestos where id=%(id)s'
+    return devolverPlan(datos['id'])
 
-    plan = db.contestarQuery(ordenPlan,datos)[0]
-
-    if(plan['fechaCreacion']):
-        plan['fechaCreacion'] = plan['fechaCreacion'].isoformat()
-
-    if(plan['fechaFinaliza']):
-        plan['fechaFinaliza'] = plan['fechaFinaliza'].isoformat()
-    
-    if(plan['fechaAprobacion']):
-        plan['fechaAprobacion'] = plan['fechaAprobacion'].isoformat()
-
-
-    ordenItems = 'select i.id,i.idItem,i.descripcion,i.completo,i.disponible,i.estado,i.valor,i.variable,i.responsable,i.precio\
-    from itemsPresupuesto i where presupuesto = %(id)s'
-
-    plan['items'] = db.contestarQuery(ordenItems,datos)
-
-    ordenComentarios = 'select comentario,fecha,alCliente from comentariosItems where item = %(id)s'
-
-    comentarios = {}
-
-    ordenEstados = 'select id,item,descripcion from estadosItems where item = %(id)s'
-
-    estados = {}
-
-    ordenRequisitos = 'select r.item,i.descripcion,r.completo from requisitosItemPresupuesto r inner join\
-    itemsPresupuesto i on i.id = r.requisito where item = %(id)s'
-
-    requisitos = {}
-    
-    ordenHistorialItems = 'select item,fecha,texto from historialEstadosItems where item = %(id)s order by fecha ASC'
-
-    historialItems = {}
-
-    for item in plan['items']:
-        
-        comentarios[item['id']] = db.contestarQuery(ordenComentarios,{'id':item['id']})
-        for comen in comentarios[item['id']]:
-            comen['fecha'] = comen['fecha'].isoformat()
-
-    for item in plan['items']:
-
-        estados[item['id']] = db.contestarQuery(ordenEstados,{'id':item['idItem']})
-
-    for item in plan['items']:
-        
-        requisitos[item['id']] = db.contestarQuery(ordenRequisitos,{'id':item['id']})
-
-    for item in plan['items']:
-        historialItems[item['id']] = db.contestarQuery(ordenHistorialItems,{'id':item['id']})
-
-    print estados
-
-    plan['comentarios'] = comentarios
-
-    plan['estados'] = estados
-
-    plan['historial'] = historialItems
-
-    plan['requisitos'] = requisitos
-
-    return dumps(plan)
 
 
 @route('/plan/item/guardarComentario',method='POST')
@@ -201,7 +213,9 @@ def guardarComentario():
     db.contestarQuery(orden,datos,False)
     db.aceptarCambios()
 
-    return
+    ordenPlan = 'select presupuesto from itemsPresupuesto where id = %(id)s'
+    presup = db.contestarQuery(ordenPlan,datos)[0]
+    return devolverPlan(presup['presupuesto'])
 
 
 
@@ -209,19 +223,22 @@ def guardarComentario():
 def actualizarResponsableItem():
     datos = request.json['datos']
     ordenResponsable = 'update itemsPresupuesto set responsable = %(responsable)s where id = %(id)s'
-    db.contestarQuery(ordenResponsable,datos)
-    db.aceptarCambios
-    return
+    db.contestarQuery(ordenResponsable,datos,False)
+    db.aceptarCambios()
+
+    ordenPlan = 'select presupuesto from itemsPresupuesto where id = %(id)s'
+    presup = db.contestarQuery(ordenPlan,datos)[0]
+    return devolverPlan(presup['presupuesto'])
 
 
 @route('/plan/item/actualizarEstado',method='POST')
 def actualizarEstadoItem():
     datos = request.json['datos']
-    ordenDatosItem = 'select idItem from itemsPresupuesto where id = %(id)s'
+    ordenDatosItem = 'select idItem,presupuesto from itemsPresupuesto where id = %(id)s'
     idItem = db.contestarQuery(ordenDatosItem,datos)[0]
     ordenEstados = 'select id,completaItem from estadosItems where item = %(idItem)s;'
     estados = db.contestarQuery(ordenEstados,idItem)
-    print estados
+
     ordenActualizar = 'update itemsPresupuesto set estado = %(idEst)s, completo = %(completaItem)s where id = %(id)s'
     
     ordenCompletarRequisito = 'update requisitosItempresupuesto set completo = true where requisito = %(id)s;'
@@ -237,7 +254,8 @@ def actualizarEstadoItem():
 
     db.contestarQuery(ordenActualizar,{'idEst':datos['estado'],'completaItem':estadosDic[datos['estado']]['completaItem'],'id':datos['id']},False)
     db.aceptarCambios()
-    return 
+
+    return devolverPlan(idItem['presupuesto'])
 
 @route('/plan/item/actualizarValor',method='POST')
 def actualizarValorItem():
@@ -252,6 +270,13 @@ def actualizarValorItem():
     ordenActualizarRequisitos = 'update requisitosItemPresupuesto set completo = true where requisito = %(id)s'
     db.contestarQuery(ordenActualizarRequisitos,datos,False)
     db.aceptarCambios()
+
+    ordenObtenerArea = 'select presupuesto from itemsPresupuesto where id=%(id)s'
+    area = db.contestarQuery(ordenObtenerArea,datos)[0]
+    
+    return devolverPlan(area['presupuesto'])
+
+
 
 #########################################################################################
 #                                  AREAS                                                #
@@ -555,4 +580,4 @@ class SSLWebServer(ServerAdapter):
 
 server_names['sslwebserver'] = SSLWebServer
 
-run(host="0.0.0.0",port=1400)
+run(host="0.0.0.0",port=1400,server='sslwebserver')

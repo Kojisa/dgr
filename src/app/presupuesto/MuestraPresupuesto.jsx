@@ -69,8 +69,14 @@ export class Presupuesto extends Component{
         
     }
 
+    actualizarComentarios(comentarios){
+        this.setState({comentarios:comentarios})
+    }
+
     recibirItems(datos){
-        console.log(datos)
+        if(!datos){
+            return;
+        }
         let items = datos.items;
         let estados = {};
         let estadosRaw = datos.estados;
@@ -112,10 +118,8 @@ export class Presupuesto extends Component{
         for( let x = 0; x < items.length; x++){
             let habilitado = true;
             if(items[x].id in this.state.requisitos){
-                console.log('entra')
                 let req = this.state.requisitos[items[x].id];
                 for (let x = 0; x< req.length; x++){
-                    console.log(req[x])
                     if(req[x].completo === 0){
                         habilitado = false;
                         break;
@@ -182,7 +186,6 @@ export class Presupuesto extends Component{
         if(this.state.elegido != -1){
             let estados = []
             let id = this.state.items[this.state.elegido].id
-            console.log(this.state.estados)
             if(id in this.state.estados){
                 estados = this.state.estados[id]
             }
@@ -201,11 +204,13 @@ export class Presupuesto extends Component{
             requisitos={requisitos}
             precio={this.state.items[this.state.elegido].precio}
             estado={this.state.items[this.state.elegido].estado} 
-            valor={this.state.items[this.state.elegido].valor}/>
+            valor={this.state.items[this.state.elegido].valor}
+            funComen={this.actualizarComentarios}
+            funItems={this.recibirItems}/>
         }
 
-        return( <Paper>
-            <div style={{margin:'5px',display:'inline-block'}} >
+        return( <div>
+            <Paper style={{width:'300px',margin:'5px',display:'inline-block'}} >
                 <span>{this.state.alias}</span>
                 <br/>
                 <span>Fecha de Cracion: {this.state.fechaCreacion}</span>
@@ -213,11 +218,11 @@ export class Presupuesto extends Component{
                 <span>Estado: {estado}</span>
                 <br/>
                 {items}
-            </div>
-            <div>
+            </Paper>
+            <div style={{marginLeft:'5px',display:'inline-block',verticalAlign:'top'}}>
                 {item}
             </div>
-        </Paper> )
+        </div> )
     }
 
 }
@@ -251,6 +256,9 @@ class EstadoItem extends Component{
             estado:props.estado,
             valor:props.valor,
         }
+
+        this.actualizarComentarios = props.funComen;
+        this.actualizarItems = props.funItems;
         this.db = new DBHandler();
         
     }
@@ -288,10 +296,13 @@ class EstadoItem extends Component{
                                         valor={this.state.valor}
                                         precio={this.state.precio}
                                         disponible={this.state.disponible}
-                                        plan={this.state.id}  />
+                                        plan={this.state.id} 
+                                        funItems = {this.actualizarItems}
+                                        />
                         </Tab>
                         <Tab label='Comentarios'>
-                            <Comentarios comentarios={this.state.comentarios} plan={this.state.id} />
+                            <Comentarios funComen ={this.actualizarItems}
+                            comentarios={this.state.comentarios} plan={this.state.id} />
                         </Tab>
                         <Tab label='Otros' >
 
@@ -316,6 +327,8 @@ class Comentarios extends Component{
             alCliente:false,
 
         }
+
+        this.actualizarComentarios = props.funComen;
         this.db = new DBHandler();
     }
 
@@ -323,12 +336,10 @@ class Comentarios extends Component{
         let dic = {
             comentarios:props.comentarios,
             plan:props.plan,
+            comentario:'',
+            fecha:'',
+            alCliente:false,
             
-        }
-        if(props.plan != this.state.plan){
-            dic.comentario = '';
-            dic.fecha = '';
-            dic.alCliente = false;
         }
         this.setState(dic);
     }
@@ -352,12 +363,14 @@ class Comentarios extends Component{
             <div style={{margin:'5px'}} >
                 <div>
                     <TextField floatingLabelText='Fecha' type='date' floatingLabelFixed={true}
-                    onChange={(ev)=>this.setState({fecha:ev.target.value})}  />
+                    onChange={(ev)=>this.setState({fecha:ev.target.value})} 
+                    value={this.state.fecha} />
                     <br/>
                     <TextField
+                        value={this.state.comentario}
                         floatingLabelText="Comentario"
                         multiLine={true}
-                        maxLegnth={100}
+                        maxLength={100}
                         style={{height:'100px'}}
                         onChange={(ev)=>this.setState({comentario:ev.target.value})} />
                     <br/>
@@ -369,7 +382,7 @@ class Comentarios extends Component{
                     <RaisedButton
                         primary={true}
                         label="Enviar"
-                        onClick={()=>this.db.guardar_comentario(null,{
+                        onClick={()=>this.db.guardar_comentario(this.actualizarComentarios,{
                             id:this.state.plan,
                             comentario:this.state.comentario,
                             alCliente:this.state.alCliente,
@@ -453,6 +466,8 @@ class DatosItem extends Component{
             plan:props.plan,
         }
         this.actualizarValor = this.actualizarValor.bind(this);
+        this.actualizarItems = props.funItems;
+        this.actualizarResponsable = this.actualizarResponsable.bind(this);
         this.db = new DBHandler();
     }
 
@@ -476,15 +491,15 @@ class DatosItem extends Component{
 
     actualizarValor(){
         if(this.state.variable === 0){
-            this.db.actualizar_item_plan_valor(null,{id:this.state.plan,valor:this.state.valor});
+            this.db.actualizar_item_plan_valor(this.actualizarItems,{id:this.state.plan,valor:this.state.valor});
         }
         else{
-            this.db.actualizar_item_plan_estado(null,{id:this.state.plan,estado:this.state.estado});
+            this.db.actualizar_item_plan_estado(this.actualizarItems,{id:this.state.plan,estado:this.state.estado});
         }
     }
 
     actualizarResponsable(){
-        this.db.actualizarResponsable(null,{id:this.state.plan,estado:this.state.responsable});
+        this.db.actualizar_item_plan_responsable(this.actualizarItems,{id:this.state.plan,responsable:this.state.responsable});
     }
 
     render(){
@@ -494,12 +509,15 @@ class DatosItem extends Component{
         if(this.state.completo === 1){
             completo = true;
         }
-        if(this.state.variable === 0){    
+        if(this.state.variable === 0){
+            let campo = this.state.valor;
+            if(!campo){
+                campo = '';
+            } 
             valor = <TextField floatingLabelText='Variable' onChange={(ev)=>this.setState({valor:ev.target.value})}
-             value={this.state.valor} disabled={completo} ></TextField>
+             value={campo} disabled={completo} ></TextField>
         }
         else{
-            console.log(this.state.estado)
             let estados = this.state.estados.map((elem,index)=><MenuItem value={elem.id} primaryText={elem.descripcion} key = {index}/>)
             valor = <SelectField value={this.state.estado} disabled={completo} onChange={(elem,i,v)=>this.setState({estado:v})}>
                 {estados}
@@ -516,7 +534,7 @@ class DatosItem extends Component{
                 <SelectField value={this.state.responsable} disabled={completo} onChange={(elem,i,v)=>this.setState({responsable:v})}>
                     {this.state.responsables}
                 </SelectField>
-                <RaisedButton label='Actualizar' disabled={completo} />
+                <RaisedButton label='Actualizar' disabled={completo} onClick={this.actualizarResponsable}/>
                 <br/>
                 Valor: <label htmlFor="">{this.state.precio}</label>
             </div>
